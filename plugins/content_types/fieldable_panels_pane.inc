@@ -12,16 +12,140 @@ $plugin = array(
   'category' => t('Fielded panes'),
   'all contexts' => TRUE,
   'defaults' => array(),
-//  'edit form' => '',
-//  'add form' => '',
   'edit form' => 'fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form',
   'edit text' => t('Edit'),
 );
 
+// --------------------------------------------------------------------------
+// Callbacks, many of them automatically named, for rendering content.
+
 /**
- * Settings for the default custom content type.
+ * Callback to return the custom content types with the specified $subtype_name.
+ */
+function fieldable_panels_panes_fieldable_panels_pane_content_type_content_type($subtype_name) {
+  if ($subtype_name == 'custom') {
+    return _fieldable_panels_panes_default_content_type();
+  }
+  else {
+    if ($content) {
+      return _fieldable_panels_panes_custom_content_type($content);
+    }
+  }
+}
+
+/**
+ * Callback to return all custom content types available.
+ */
+function fieldable_panels_panes_fieldable_panels_pane_content_type_content_types() {
+  $types = _fieldable_panels_panes_default_content_type();
+
+  $ids = db_query('SELECT fpid FROM {fieldable_panels_panes} WHERE reusable = 1')->fetchCol();
+  if ($ids) {
+    $panes = fieldable_panels_panes_load_multiple($ids);
+    foreach ($panes as $pane) {
+      $subtype = _fieldable_panels_panes_custom_content_type($pane);
+      $types[$subtye['name']] = $subtype;
+    }
+  }
+
+  return $types;
+}
+
+/**
+ * Callback to render our content type.
+ */
+function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subtype, $conf, $panel_args, $context) {
+  $plugin = ctools_get_content_type('fieldable_panels_pane');
+  $entity = fieldable_panels_panes_load_entity($plugin, $subtype, $conf);
+
+  $block = new stdClass();
+  $block->title = !empty($entity->title) ? filter_xss_admin($entity->title) : '';
+  $block->content = fieldable_panels_pane_view($entity);
+
+  return $block;
+}
+
+/**
+ * Callback to provide the administrative title of the custom content.
+ */
+function fieldable_panels_panes_fieldable_panels_pane_content_type_admin_title($subtype, $conf) {
+  $plugin = ctools_get_content_type('fieldable_panels_pane');
+  $entity = fieldable_panels_panes_load_entity($plugin, $subtype, $conf);
+
+  $output = t('Entity pane');
+  if (isset($entity) && is_object($entity)) {
+    $output = t('Entity pane: @title', array('@title' => $entity->title));
+  }
+
+  return $output;
+}
+
+/**
+ * Form used to edit our content type.
+ */
+function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form($form, &$form_state) {
+  $conf = &$form_state['conf'];
+  $plugin = &$form_state['plugin'];
+  $subtype_name = $form_state['subtype_name'];
+
+  $entity = $form_state['entity'] = fieldable_panels_panes_load_entity($plugin, $subtype_name, $conf);
+
+  // It's possible that we have a reference to an entity that is no longer valid.
+  // If so, bail, because otherwise field API will whitescreen.
+  if (!$entity) {
+    $form['error'] = array(
+      '#markup' => t('The pane entity referenced does not appear to be valid.'),
+    );
+    return $form;
+  }
+
+  $form['#parameters'] = array('fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form');
+
+  return fieldable_panels_panes_entity_edit_form($form, $form_state);
+}
+
+/**
+ * Validate submission of our content type edit form.
+ */
+function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form_validate($form, &$form_state) {
+  if ($form_state['entity']) {
+    fieldable_panels_panes_entity_edit_form_validate($form, $form_state);
+  }
+}
+
+/**
+ * Submit our content type edit form.
+ */
+function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form_submit($form, &$form_state) {
+  $entity = $form_state['entity'];
+  if (!$entity) {
+    return;
+  }
+
+  fieldable_panels_panes_entity_edit_form_submit($form, $form_state);
+  if (!empty($entity->is_new)) {
+    if (module_exists('uuid') && isset($entity->uuid)) {
+      $entity_id = 'uuid:' . $entity->uuid;
+    }
+    else {
+      $entity_id = 'fpid:' . $entity->fpid;
+    }
+
+    // @todo -- this won't work if $form_state does not contain
+    // 'pane' which could theoretically happen in a non-Panels
+    // use case. Not that anybody uses this outside of Panels.
+    $form_state['pane']->subtype = $entity_id;
+  }
+}
+
+// --------------------------------------------------------------------------
+// Internal methods used by the above callbacks.
+
+/**
+ * Provide the default content types.
  *
- * The default is the one that allows the user to actually create a type.
+ * These are all visible in the UI as the content types that allow a user
+ * to add new panel pane entities that will then be stored in the database.
  */
 function _fieldable_panels_panes_default_content_type() {
   $types = array();
@@ -105,104 +229,3 @@ function _fieldable_panels_panes_load_entity($subtype_name) {
 
   return $content;
 }
-
-/**
- * Return the custom content types with the specified $subtype_name.
- */
-function fieldable_panels_panes_fieldable_panels_pane_content_type_content_type($subtype_name) {
-  if ($subtype_name == 'custom') {
-    return _fieldable_panels_panes_default_content_type();
-  }
-  else {
-    if ($content) {
-      return _fieldable_panels_panes_custom_content_type($content);
-    }
-  }
-}
-
-/**
- * Return all custom content types available.
- */
-function fieldable_panels_panes_fieldable_panels_pane_content_type_content_types() {
-  $types = _fieldable_panels_panes_default_content_type();
-
-  $ids = db_query('SELECT fpid FROM {fieldable_panels_panes} WHERE reusable = 1')->fetchCol();
-  if ($ids) {
-    $panes = fieldable_panels_panes_load_multiple($ids);
-    foreach ($panes as $pane) {
-      $subtype = _fieldable_panels_panes_custom_content_type($pane);
-      $types[$subtye['name']] = $subtype;
-    }
-  }
-
-  return $types;
-}
-
-/**
- * Implementation of hook_content_type_render
- */
-function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subtype, $conf, $panel_args, $context) {
-  $plugin = ctools_get_content_type('fieldable_panels_pane');
-  $entity = fieldable_panels_panes_load_entity($plugin, $subtype, $conf);
-
-  $block = new stdClass();
-  $block->title = !empty($entity->title) ? filter_xss_admin($entity->title) : '';
-  $block->content = fieldable_panels_pane_view($entity);
-
-  return $block;
-}
-
-/**
- * Implementation of hook_content_type_edit_form
- */
-function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form($form, &$form_state) {
-  $conf = &$form_state['conf'];
-  $plugin = &$form_state['plugin'];
-  $subtype_name = $form_state['subtype_name'];
-
-  $entity = $form_state['entity'] = fieldable_panels_panes_load_entity($plugin, $subtype_name, $conf);
-
-  $form['#parameters'] = array('fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form');
-
-  return fieldable_panels_panes_entity_edit_form($form, $form_state);
-
-  return $form;
-}
-
-function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form_validate($form, &$form_state) {
-  fieldable_panels_panes_entity_edit_form_validate($form, $form_state);
-}
-
-function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form_submit($form, &$form_state) {
-  $entity = $form_state['entity'];
-  fieldable_panels_panes_entity_edit_form_submit($form, $form_state);
-  if (!empty($entity->is_new)) {
-    if (module_exists('uuid') && isset($entity->uuid)) {
-      $entity_id = 'uuid:' . $entity->uuid;
-    }
-    else {
-      $entity_id = 'fpid:' . $entity->fpid;
-    }
-
-    // @todo -- this won't work if $form_state does not contain
-    // 'pane' which could theoretically happen in a non-Panels
-    // use case. Not that anybody uses this outside of Panels.
-    $form_state['pane']->subtype = $entity_id;
-  }
-}
-
-/**
- * Callback to provide the administrative title of the custom content.
- */
-function fieldable_panels_panes_fieldable_panels_pane_content_type_admin_title($subtype, $conf) {
-  $plugin = ctools_get_content_type('fieldable_panels_pane');
-  $entity = fieldable_panels_panes_load_entity($plugin, $subtype, $conf);
-
-  $output = t('Entity pane');
-  if (isset($entity) && is_object($entity)) {
-    $output = t('Entity pane: @title', array('@title' => $entity->title));
-  }
-
-  return $output;
-}
-
