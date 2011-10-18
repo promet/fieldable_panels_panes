@@ -196,8 +196,7 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form_sub
 function fieldable_panels_panes_fieldable_panels_pane_content_type_admin_title($subtype, $conf) {
   $plugin = ctools_get_content_type('fieldable_panels_pane');
   $entity = fieldable_panels_panes_load_entity($plugin, $subtype, $conf);
-  dsm(func_get_args());
-  dsm($entity);
+
   $output = t('Entity pane');
   if (isset($entity) && is_object($entity)) {
     $output = t('Entity pane: @title', array('@title' => $entity->title));
