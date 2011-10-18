@@ -1,0 +1,8 @@
+name = "Fieldable Panels Panes"
+description = "Allow the creation of fieldable panels pane entities."
+package = "Panels"
+core = "7.x"
+dependencies[] = "panels"
+dependencies[] = "field_ui"
+
+files[] = includes/PanelsPaneController.class.php

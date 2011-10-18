@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function fieldable_panels_panes_schema() {
+  $schema = array();
+
+  $schema['fieldable_panels_panes'] = array(
+    'description' => 'Entity table for panel pane content with fields.',
+    'fields' => array(
+      'fpid' => array(
+        'description' => 'The primary identifier for the entity.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'bundle' => array(
+        'description' => 'The bundle of the entity.',
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'title' => array(
+        'description' => 'The title of the entity.',
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'reusable' => array(
+        'description' => 'Whether or not this entity will appear in the Add Content dialog.',
+        'type' => 'int',
+        'size' => 'tiny',
+      ),
+      'admin_title' => array(
+        'description' => 'The title it will appear in the Add Content dialog as.',
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'admin_description' => array(
+        'description' => 'The description it will appear in the Add Content dialog with.',
+        'type' => 'text',
+      ),
+      'category' => array(
+        'description' => 'The category it will appear in the Add Content dialog under.',
+        'type' => 'text',
+      ),
+    ),
+    'primary key' => array('fpid'),
+    'indexes' => array(
+      'reusable' => array('reusable'),
+    ),
+  );
+
+  return $schema;
+}
