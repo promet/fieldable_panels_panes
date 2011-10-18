@@ -142,6 +142,7 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_content_types
  * Implementation of hook_content_type_render
  */
 function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subtype, $conf, $panel_args, $context) {
+  $plugin = ctools_get_content_type('fieldable_panels_pane');
   $entity = fieldable_panels_panes_load_entity($plugin, $subtype, $conf);
 
   $block = new stdClass();

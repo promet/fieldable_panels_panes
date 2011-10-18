@@ -169,7 +169,7 @@ function fieldable_panels_panes_preprocess_fieldable_panels_pane(&$vars) {
   }
 
   // Make the field variables available with the appropriate language.
-  field_attach_preprocess('fieldable_panels_pane', $vars['elements'], $vars['content'], $vars);
+  field_attach_preprocess('fieldable_panels_pane', $vars['elements']['#element'], $vars['content'], $vars);
 
   $vars['fields'] = '';
   foreach($vars['content'] as $content) {
@@ -217,8 +217,8 @@ function fieldable_panels_panes_save($entity) {
  *
  * @see node_view()
  */
-function fieldable_panels_pane_view($fpid, $view_mode = 'full', $langcode = NULL) {
-  return entity_get_controller('fieldable_panels_pane')->view($fpid, $view_mode, $langcode);
+function fieldable_panels_pane_view($entity, $view_mode = 'full', $langcode = NULL) {
+  return entity_get_controller('fieldable_panels_pane')->view($entity, $view_mode, $langcode);
 }
 
 /**
