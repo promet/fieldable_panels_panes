@@ -23,12 +23,14 @@ $plugin = array(
  * Callback to return the custom content types with the specified $subtype_name.
  */
 function fieldable_panels_panes_fieldable_panels_pane_content_type_content_type($subtype_name) {
-  if ($subtype_name == 'custom') {
-    return _fieldable_panels_panes_default_content_type();
+  $types = _fieldable_panels_panes_default_content_type();
+  if (isset($types[$subtype_name])) {
+    return $types[$subtype_name];
   }
   else {
-    if ($content) {
-      return _fieldable_panels_panes_custom_content_type($content);
+    $entity = fieldable_panels_panes_load_entity($subtype_name);
+    if ($entity) {
+      return _fieldable_panels_panes_custom_content_type($entity);
     }
   }
 }
@@ -41,10 +43,10 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_content_types
 
   $ids = db_query('SELECT fpid FROM {fieldable_panels_panes} WHERE reusable = 1')->fetchCol();
   if ($ids) {
-    $panes = fieldable_panels_panes_load_multiple($ids);
-    foreach ($panes as $pane) {
-      $subtype = _fieldable_panels_panes_custom_content_type($pane);
-      $types[$subtye['name']] = $subtype;
+    $entities = fieldable_panels_panes_load_multiple($ids);
+    foreach ($entities as $entity) {
+      $subtype = _fieldable_panels_panes_custom_content_type($entity);
+      $types[$subtype['name']] = $subtype;
     }
   }
 
@@ -55,26 +57,28 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_content_types
  * Callback to render our content type.
  */
 function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subtype, $conf, $panel_args, $context) {
-  $plugin = ctools_get_content_type('fieldable_panels_pane');
-  $entity = fieldable_panels_panes_load_entity($plugin, $subtype, $conf);
+  $entity = fieldable_panels_panes_load_entity($subtype);
 
-  $block = new stdClass();
-  $block->title = !empty($entity->title) ? filter_xss_admin($entity->title) : '';
-  $block->content = fieldable_panels_pane_view($entity);
+  if ($entity) {
+    $block = new stdClass();
+    $block->title = !empty($entity->title) ? filter_xss_admin($entity->title) : '';
+    $block->content = fieldable_panels_pane_view($entity);
 
-  return $block;
+    return $block;
+  }
 }
 
 /**
  * Callback to provide the administrative title of the custom content.
  */
 function fieldable_panels_panes_fieldable_panels_pane_content_type_admin_title($subtype, $conf) {
-  $plugin = ctools_get_content_type('fieldable_panels_pane');
-  $entity = fieldable_panels_panes_load_entity($plugin, $subtype, $conf);
+  $entity = fieldable_panels_panes_load_entity($subtype);
 
-  $output = t('Entity pane');
+  $output = t('Deleted/removed entity pane');
   if (isset($entity) && is_object($entity)) {
-    $output = t('Entity pane: @title', array('@title' => $entity->title));
+    $title = !empty($entity->admin_title) ? $entity->admin_title : (!empty($entity->title) ? $entity->title : t('No title'));
+
+    $output = $title;
   }
 
   return $output;
@@ -85,23 +89,27 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_admin_title($
  */
 function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form($form, &$form_state) {
   $conf = &$form_state['conf'];
-  $plugin = &$form_state['plugin'];
   $subtype_name = $form_state['subtype_name'];
 
-  $entity = $form_state['entity'] = fieldable_panels_panes_load_entity($plugin, $subtype_name, $conf);
+  $entity = $form_state['entity'] = fieldable_panels_panes_load_entity($subtype_name);
 
   // It's possible that we have a reference to an entity that is no longer valid.
   // If so, bail, because otherwise field API will whitescreen.
   if (!$entity) {
     $form['error'] = array(
-      '#markup' => t('The pane entity referenced does not appear to be valid.'),
+      '#markup' => t('The pane entity referenced does not appear to be valid. It was probably deleted and you should remove this pane.'),
     );
     return $form;
   }
 
   $form['#parameters'] = array('fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form');
 
-  return fieldable_panels_panes_entity_edit_form($form, $form_state);
+  $form = fieldable_panels_panes_entity_edit_form($form, $form_state);
+  $form['reusable']['warning'] = array(
+    '#markup' => '<div type="description">' . t('Note: Editing any value on a reusable pane will change the value everywhere this pane is used.') . '</div>',
+  );
+
+  return $form;
 }
 
 /**
@@ -190,13 +198,10 @@ function _fieldable_panels_panes_custom_content_type($entity) {
 }
 
 /**
- * Properly load the entity the subtype and configuration.
+ * Properly load the entity the subtype.
  */
-function fieldable_panels_panes_load_entity($plugin, $subtype_name, $conf) {
-  // First try this:
-  if (!empty($conf['entity_id'])) {
-    return _fieldable_panels_panes_load_entity($conf['entity_id']);
-  }
+function fieldable_panels_panes_load_entity($subtype_name) {
+  $plugin = ctools_get_content_type('fieldable_panels_pane');
 
   // Next, check to see how the subtype is configured.
   $subtype_info = ctools_content_get_subtype($plugin, $subtype_name);

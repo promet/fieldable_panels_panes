@@ -56,4 +56,33 @@ class PanelsPaneController extends DrupalDefaultEntityController {
 
     return drupal_render($pane->content);
   }
+
+  public function delete($fpids) {
+    $transaction = db_transaction();
+    if (!empty($fpids)) {
+      $entities = fieldable_panels_panes_load_multiple($fpids, array());
+
+      try {
+        foreach ($entities as $fpid => $node) {
+          // Call the node-specific callback (if any):
+          module_invoke_all('entity_delete', $node, 'fieldable_panels_pane');
+          field_attach_delete('fieldable_panels_pane', $node);
+        }
+
+        // Delete after calling hooks so that they can query node tables as needed.
+        db_delete('fieldable_panels_panes')
+          ->condition('fpid', $fpids, 'IN')
+          ->execute();
+      }
+      catch (Exception $e) {
+        $transaction->rollback();
+        watchdog_exception('fieldable_panels_pane', $e);
+        throw $e;
+      }
+
+      // Clear the page and block and node_load_multiple caches.
+      entity_get_controller('fieldable_panels_pane')->resetCache();
+    }
+  }
+
 }

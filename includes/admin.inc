@@ -65,6 +65,7 @@ function fieldable_panels_panes_entities_page() {
  * List all entities for the given type.
  */
 function fieldable_panels_panes_entities_list_page($type) {
+  return views_embed_view('fieldable_pane_entities', 'default', $type);
   return t('The list page still needs to be implemented.');
 }
 
@@ -101,4 +102,32 @@ function fieldable_panels_panes_entity_edit_page($entity) {
   );
 
   return drupal_build_form('fieldable_panels_panes_entity_edit_form', $form_state);
+}
+
+/**
+ * Menu callback -- ask for confirmation of node deletion
+ */
+function fieldable_panels_panes_entity_delete_form($form, &$form_state, $entity) {
+  $form_state['entity'] = $entity;
+  return confirm_form($form,
+    t('Are you sure you want to delete %title?', array('%title' => $entity->title)),
+    'admin/structure/panels/entity/view/' . $entity->fpid,
+    t('This action cannot be undone. Note that deleting this entity will not delete panes using it, they will exist but display nothing.'),
+    t('Delete'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Execute node deletion
+ */
+function fieldable_panels_panes_entity_delete_form_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    $entity = $form_state['entity'];
+    fieldable_panels_panes_delete($entity->fpid);
+    watchdog('fieldable_panels_pane', '@type: deleted %title.', array('@type' => $entity->bundle, '%title' => $entity->title));
+    drupal_set_message(t('@type %title has been deleted.', array('@type' => fieldable_panels_pane_get_bundle_label($entity->bundle), '%title' => $entity->title)));
+  }
+
+  $form_state['redirect'] = '<front>';
 }

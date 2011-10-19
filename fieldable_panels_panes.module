@@ -103,6 +103,16 @@ function fieldable_panels_panes_menu() {
     'weight' => -8,
   ) + $base;
 
+  $items['admin/structure/panels/entity/view/%fieldable_panels_panes/delete'] = array(
+    'title' => 'delete',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('fieldable_panels_panes_entity_delete_form', 5),
+    'access callback' => 'fieldable_panels_panes_entity_access',
+    'access arguments' => array(5),
+    'weight' => -8,
+  ) + $base;
+
   $items['admin/structure/panels/entity/manage/%fieldable_panels_panes_type'] = array(
     'title callback' => 'fieldable_panels_panes_entities_title',
     'title arguments' => array(5),
@@ -217,6 +227,19 @@ function fieldable_panels_panes_ctools_plugin_directory($owner, $plugin_type) {
 }
 
 // -------------------------------------------------------------------------
+// CTools hooks
+
+/**
+ * Implements hook_views_api
+ */
+function fieldable_panels_panes_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'fieldable_panels_panes') . '/plugins/views',
+  );
+}
+
+// -------------------------------------------------------------------------
 // Theming
 
 /**
@@ -238,7 +261,7 @@ function fieldable_panels_panes_preprocess_fieldable_panels_pane(&$vars) {
 }
 
 // -------------------------------------------------------------------------
-// Database API functions
+// Database and general entity API functions
 
 /**
  * Panel pane entity loader.
@@ -270,6 +293,26 @@ function fieldable_panels_panes_load_multiple($ids, $conditions = array(), $rese
  */
 function fieldable_panels_panes_save($entity) {
   return entity_get_controller('fieldable_panels_pane')->save($entity);
+}
+
+/**
+ * Delete a fieldable panel pane.
+ *
+ * @param $fpid
+ *   A fieldable panel pane ID.
+ */
+function fieldable_panels_panes_delete($fpid) {
+  fieldable_panels_panes_delete_multiple(array($fpid));
+}
+
+/**
+ * Delete multiple fieldable panel panes.
+ *
+ * @param $fpids
+ *   An array of fieldable panel pane IDs.
+ */
+function fieldable_panels_panes_delete_multiple($fpids) {
+  return entity_get_controller('fieldable_panels_pane')->delete($fpids);
 }
 
 /**
@@ -310,6 +353,34 @@ function fieldable_panels_pane_create($values = array()) {
 }
 
 /**
+ * Get the safe human readable name of an entity bundle.
+ */
+function fieldable_panels_pane_get_bundle_label($bundle) {
+  $entity_info = entity_get_info('fieldable_panels_pane');
+  if (empty($entity_info['bundles'][$bundle]['label'])) {
+    $output = t('Unknown content type');
+  }
+
+  return $entity_info['bundles'][$bundle]['label'];
+}
+
+/**
+ * Get an array of entity bundle names, suitable for an options form.
+ */
+function fieldable_panels_pane_get_bundle_labels() {
+  $bundles = array();
+  $entity_info = entity_get_info('fieldable_panels_pane');
+
+  foreach ($entity_info['bundles'] as $bundle => $info) {
+    $bundles[$bundle] = $info['label'];
+  }
+
+  asort($bundles);
+
+  return $bundles;
+}
+
+/**
  * Basic edit form for the pane entity.
  *
  * The entity being edited should be stored in $form_state['entity']
@@ -340,7 +411,7 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
   $form['reusable']['reusable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Make this entity reusable'),
-    '#default_value' => FALSE,
+    '#default_value' => $entity->reusable,
     '#id' => 'edit-reusable',
   );
 
@@ -353,7 +424,7 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
   );
 
   $form['reusable']['admin_title'] = array(
-    '#type' => 'textarea',
+    '#type' => 'textfield',
     '#title' => t('Administrative title'),
     '#title' => t('The name this content will appear in the "Add content" modal.'),
     '#dependency' => array('edit-reusable' => array(1)),
@@ -407,4 +478,7 @@ function fieldable_panels_panes_entity_edit_form_submit($form, &$form_state) {
   field_attach_submit('fieldable_panels_pane', $entity, $form, $form_state);
 
   fieldable_panels_panes_save($entity);
+  if (!empty($form_state['add submit'])) {
+    drupal_set_message(t('The entity has been saved.'));
+  }
 }
