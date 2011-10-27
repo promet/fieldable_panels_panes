@@ -29,14 +29,15 @@ class fieldable_panels_panes_handler_field_view_entity extends views_handler_fie
     }
   }
 
-  function access() {
-    return user_access('administer fieldable panels panes');
-  }
-
   function render_link($entity, $values) {
-    $this->options['alter']['make_link'] = TRUE;
-    $this->options['alter']['path'] = "admin/structure/panels/entity/view/$entity->fpid";
-    $text = !empty($this->options['text']) ? $this->options['text'] : t('view');
-    return $text;
+    if (fieldable_panels_panes_access('view', $entity)) {
+      $this->options['alter']['make_link'] = TRUE;
+      $this->options['alter']['path'] = "admin/structure/panels/entity/view/$entity->fpid";
+      $text = !empty($this->options['text']) ? $this->options['text'] : t('view');
+      return $text;
+    }
+    else {
+      $this->options['alter']['path'] = '';
+    }
   }
 }

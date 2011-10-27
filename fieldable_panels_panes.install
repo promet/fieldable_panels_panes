@@ -43,6 +43,20 @@ function fieldable_panels_panes_schema() {
         'description' => 'The category it will appear in the Add Content dialog under.',
         'type' => 'text',
       ),
+      'view_access' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'description' => 'Access rules to describe if the user has view access to this entity.',
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
+      'edit_access' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'description' => 'Access rules to describe if the user has view access to this entity.',
+        'serialize' => TRUE,
+        'object default' => array(),
+      ),
     ),
     'primary key' => array('fpid'),
     'indexes' => array(
@@ -51,4 +65,29 @@ function fieldable_panels_panes_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Add access control fields to entity.
+ */
+function fieldable_panels_panes_update_7001() {
+  $new_fields = array(
+    'view_access' => array(
+      'type' => 'text',
+      'size' => 'big',
+      'description' => 'Access rules to describe if the user has view access to this entity.',
+      'serialize' => TRUE,
+      'object default' => array(),
+    ),
+    'edit_access' => array(
+      'type' => 'text',
+      'size' => 'big',
+      'description' => 'Access rules to describe if the user has view access to this entity.',
+      'serialize' => TRUE,
+      'object default' => array(),
+    ),
+  );
+
+  db_add_field('fieldable_panels_panes', 'view_access', $new_fields['view_access']);
+  db_add_field('fieldable_panels_panes', 'edit_access', $new_fields['edit_access']);
 }

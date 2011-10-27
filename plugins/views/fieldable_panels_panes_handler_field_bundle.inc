@@ -29,7 +29,7 @@ class fieldable_panels_panes_handler_field_bundle extends views_handler_field {
   function render($values) {
     $value = $this->get_value($values);
     if (!$this->options['machine_name']) {
-      $value = fieldable_panels_pane_get_bundle_label($value);
+      $value = fieldable_panels_panes_get_bundle_label($value);
     }
 
     return $this->sanitize_value($value);

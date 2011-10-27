@@ -6,7 +6,7 @@ class fieldable_panels_panes_handler_filter_bundle extends views_handler_filter_
   function get_value_options() {
     if (!isset($this->value_options)) {
       $this->value_title = t('Bundles');
-      $this->value_options = fieldable_panels_pane_get_bundle_labels();
+      $this->value_options = fieldable_panels_panes_get_bundle_labels();
     }
   }
 }

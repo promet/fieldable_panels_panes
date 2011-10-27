@@ -11,8 +11,48 @@
 class PanelsPaneController extends DrupalDefaultEntityController {
   public $pane;
 
-  public function access($op, $pane) {
-    return TRUE;
+  public function attachLoad(&$queried_entities, $revision_id = FALSE) {
+    parent::attachLoad($queried_entities, $revision_id);
+
+    // We need to go through and unserialize our serialized fields.
+    foreach ($queried_entities as $entity) {
+      foreach (array('view_access', 'edit_access') as $key) {
+        if (is_string($entity->$key)) {
+          $entity->$key = unserialize($entity->$key);
+        }
+      }
+    }
+  }
+
+  public function access($op, $entity = NULL, $account = NULL) {
+    if ($op !== 'create' && !$entity) {
+      return FALSE;
+    }
+
+    // The administer permission is a blanket override.
+    if (user_access('administer fieldable panels panes')) {
+      return TRUE;
+    }
+
+    switch ($op) {
+      case 'create':
+        return user_access('create fieldable panels panes');
+
+      case 'view':
+        ctools_include('context');
+        return ctools_access($entity->view_access, fieldable_panels_panes_get_base_context($entity));
+
+      case 'update':
+        ctools_include('context');
+        return user_access('edit fieldable panels panes') && ctools_access($entity->edit_access, fieldable_panels_panes_get_base_context($entity));
+
+      case 'delete':
+        ctools_include('context');
+        return user_access('delete fieldable panels panes') && ctools_access($entity->edit_access, fieldable_panels_panes_get_base_context($entity));
+
+    }
+
+    return FALSE;
   }
 
   public function save($pane) {
@@ -83,6 +123,31 @@ class PanelsPaneController extends DrupalDefaultEntityController {
       // Clear the page and block and node_load_multiple caches.
       entity_get_controller('fieldable_panels_pane')->resetCache();
     }
+  }
+
+  public function create($values) {
+    $entity = (object) array(
+      'bundle' => $values['bundle'],
+      'language' => LANGUAGE_NONE,
+      'is_new' => TRUE,
+    );
+
+    // Ensure basic fields are defined.
+    $values += array(
+      'bundle' => 'fieldable_panels_pane',
+      'title' => '',
+      'reusable' => FALSE,
+      'admin_title' => '',
+      'admin_description' => '',
+      'category' => '',
+    );
+
+    // Apply the given values.
+    foreach ($values as $key => $value) {
+      $entity->$key = $value;
+    }
+
+    return $entity;
   }
 
 }

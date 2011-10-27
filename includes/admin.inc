@@ -74,7 +74,7 @@ function fieldable_panels_panes_entities_list_page($type) {
  */
 function fieldable_panels_panes_entities_add_page($type) {
   $form_state = array(
-    'entity' => fieldable_panels_pane_create(array('bundle' => $type)),
+    'entity' => fieldable_panels_panes_create(array('bundle' => $type)),
     'add submit' => TRUE,
   );
 
@@ -89,7 +89,7 @@ function fieldable_panels_panes_entities_add_page($type) {
  * panes (or blocks).
  */
 function fieldable_panels_panes_entity_view_page($entity) {
-  return fieldable_panels_pane_view($entity);
+  return fieldable_panels_panes_view($entity);
 }
 
 /**
@@ -126,8 +126,60 @@ function fieldable_panels_panes_entity_delete_form_submit($form, &$form_state) {
     $entity = $form_state['entity'];
     fieldable_panels_panes_delete($entity->fpid);
     watchdog('fieldable_panels_pane', '@type: deleted %title.', array('@type' => $entity->bundle, '%title' => $entity->title));
-    drupal_set_message(t('@type %title has been deleted.', array('@type' => fieldable_panels_pane_get_bundle_label($entity->bundle), '%title' => $entity->title)));
+    drupal_set_message(t('@type %title has been deleted.', array('@type' => fieldable_panels_panes_get_bundle_label($entity->bundle), '%title' => $entity->title)));
   }
 
   $form_state['redirect'] = '<front>';
+}
+
+/**
+ * Page callback to edit access control of an entity pane.
+ *
+ * @param $op
+ *   Either 'edit' or 'view' to determine which type of access.
+ * @param $entity
+ *   The entity to control access to.
+ */
+function fieldable_panels_panes_entity_edit_access_page($op, $entity) {
+  ctools_include('context-access-admin');
+  // @todo -- add view_access field.
+
+  $argument = $op . ':' . $entity->fpid;
+
+  ctools_include('object-cache');
+
+  // Ensure that if they visit this page fresh, any cached data is removed:
+  if (empty($_POST)) {
+    ctools_object_cache_clear('fieldable_panels_panes', $argument);
+  }
+  else {
+    $access = ctools_object_cache_get('fieldable_panels_panes', $argument);
+  }
+
+  if (empty($access)) {
+    $access = $entity->{$op . '_access'};
+  }
+
+  $form_state = array(
+    'access' => $access,
+    'module' => 'fieldable_panels_panes',
+    'callback argument' => $argument,
+    // A bug in context-access-admin requires this until it's fixed.
+    'argument' => $argument,
+    'contexts' => fieldable_panels_panes_get_base_context($entity),
+    'no_redirect' => TRUE,
+  );
+
+  $output = drupal_build_form('ctools_access_admin_form', $form_state);
+
+  if (!empty($form_state['executed'])) {
+    ctools_object_cache_clear('fieldable_panels_panes', $argument);
+    $entity->{$op . '_access'} = $form_state['access'];
+
+    fieldable_panels_panes_save($entity);
+    drupal_set_message(t('The access control has been updated.'));
+    drupal_goto($_GET['q']);
+  }
+
+  return $output;
 }

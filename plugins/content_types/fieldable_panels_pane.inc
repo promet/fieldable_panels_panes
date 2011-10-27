@@ -58,11 +58,19 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_content_types
  */
 function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subtype, $conf, $panel_args, $context) {
   $entity = fieldable_panels_panes_load_entity($subtype);
-
-  if ($entity) {
+  if ($entity && fieldable_panels_panes_access('view', $entity)) {
     $block = new stdClass();
     $block->title = !empty($entity->title) ? filter_xss_admin($entity->title) : '';
-    $block->content = fieldable_panels_pane_view($entity);
+    $block->content = fieldable_panels_panes_view($entity);
+
+    if (fieldable_panels_panes_access('update', $entity)) {
+      $block->admin_links[] = array(
+        'title' => t('Edit pane'),
+        'alt' => t("Edit the values in this pane"),
+        'href' => "admin/structure/panels/entity/view/$entity->fpid/edit",
+        'query' => drupal_get_destination(),
+      );
+    }
 
     return $block;
   }
@@ -208,7 +216,7 @@ function fieldable_panels_panes_load_entity($subtype_name) {
 
   // This means we're probably in the process of creating a new one.
   if (isset($subtype_info['bundle'])) {
-    return fieldable_panels_pane_create(array('bundle' => $subtype_info['bundle']));
+    return fieldable_panels_panes_create(array('bundle' => $subtype_info['bundle']));
   }
 
   // And try it this way.
