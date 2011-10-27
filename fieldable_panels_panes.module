@@ -555,6 +555,10 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
     '#weight' => 11,
   );
 
+  if (empty($entity->fpid)) {
+    $form['revision']['#access'] = FALSE;
+  }
+
   $form['reusable']['reusable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Make this entity reusable'),
@@ -573,7 +577,7 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
   $form['reusable']['admin_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Administrative title'),
-    '#title' => t('The name this content will appear in the "Add content" modal.'),
+    '#description' => t('The name this content will appear in the "Add content" modal.'),
     '#dependency' => array('edit-reusable' => array(1)),
     '#default_value' => $entity->admin_title,
   );

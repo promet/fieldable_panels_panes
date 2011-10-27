@@ -110,11 +110,30 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form($fo
     return $form;
   }
 
-  $form['#parameters'] = array('fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form');
+  // @todo: This really should be in CTools, if possible, in order to ensure AJAX works
+  // everywhere.
+
+  // module_load_include uses an unfortunately annoying syntax to work, making it
+  // difficult to translate the more simple $path + $file syntax.
+
+  $plugin = $form_state['plugin'];
+  $module = $plugin['module'];
+
+  // Cut the module path out.
+  $path = str_replace(drupal_get_path('module', $module) . '/', '', $plugin['path'] . '/' . $plugin['file']);
+  $type = pathinfo($path, PATHINFO_EXTENSION);
+  $name = str_replace('.' . $type, '', $path);
+
+  // Now add this to the build info files so that AJAX requests will know to load it.
+  $form_state['build_info']['files']["$module:$name.$type"] = array(
+    'type' => $type,
+    'module' => $module,
+    'name' => $name,
+  );
 
   $form = fieldable_panels_panes_entity_edit_form($form, $form_state);
   $form['reusable']['warning'] = array(
-    '#markup' => '<div type="description">' . t('Note: Editing any value on a reusable pane will change the value everywhere this pane is used.') . '</div>',
+    '#markup' => '<div class="description">' . t('Note: Editing any value on a reusable pane will change the value everywhere this pane is used.') . '</div>',
   );
 
   return $form;
@@ -209,6 +228,7 @@ function _fieldable_panels_panes_custom_content_type($entity) {
  * Properly load the entity the subtype.
  */
 function fieldable_panels_panes_load_entity($subtype_name) {
+  ctools_include('content');
   $plugin = ctools_get_content_type('fieldable_panels_pane');
 
   // Next, check to see how the subtype is configured.
