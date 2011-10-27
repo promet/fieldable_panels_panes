@@ -9,7 +9,7 @@
  * Entity controller class.
  */
 class PanelsPaneController extends DrupalDefaultEntityController {
-  public $pane;
+  public $entity;
 
   public function attachLoad(&$queried_entities, $revision_id = FALSE) {
     parent::attachLoad($queried_entities, $revision_id);
@@ -55,23 +55,36 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     return FALSE;
   }
 
-  public function save($pane) {
-    $pane = (object) $pane;
+  public function save($entity) {
+    $entity = (object) $entity;
+   // Determine if we will be inserting a new artwork.
+    $entity->is_new = isset($entity->fpid) && is_numeric($entity->fpid);
+
     $transaction = db_transaction();
 
-    field_attach_presave('fieldable_panels_pane', $pane);
+    field_attach_presave('fieldable_panels_pane', $entity);
+
+    // When saving a new artwork revision, unset any existing $entity->vid
+    // to ensure a new revision will actually be created and store the old
+    // revision ID in a separate property for artwork hook implementations.
+    if (!$entity->is_new && !empty($entity->revision) && $entity->vid) {
+      $entity->old_vid = $entity->vid;
+      unset($entity->vid);
+    }
 
     try {
-      if (isset($pane->fpid) && is_numeric($pane->fpid)) {
-        drupal_write_record('fieldable_panels_panes', $pane, 'fpid');
-        field_attach_update('fieldable_panels_pane', $pane);
+      $this->saveRevision($entity);
+
+      if (!$entity->is_new) {
+        drupal_write_record('fieldable_panels_panes', $entity, 'fpid');
+        field_attach_update('fieldable_panels_pane', $entity);
       }
       else {
-        drupal_write_record('fieldable_panels_panes', $pane);
-        field_attach_insert('fieldable_panels_pane', $pane);
+        drupal_write_record('fieldable_panels_panes', $entity);
+        field_attach_insert('fieldable_panels_pane', $entity);
       }
 
-      return $pane;
+      return $entity;
     }
     catch (Exception $e) {
       $transaction->rollback('fieldable_panels_panes');
@@ -82,19 +95,19 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     return FALSE;
   }
 
-  public function view($pane, $view_mode = 'full', $langcode = NULL) {
+  public function view($entity, $view_mode = 'full', $langcode = NULL) {
     // attach our fields and prepare the pane for rendering
-    field_attach_prepare_view('fieldable_panels_pane', array($pane->fpid => $pane), $view_mode, $langcode);
-    entity_prepare_view('fieldable_panels_pane', array($pane->fpid => $pane), $langcode);
-    $pane->content = field_attach_view('fieldable_panels_pane', $pane, $view_mode, $langcode);
-    $pane->content += array(
+    field_attach_prepare_view('fieldable_panels_pane', array($entity->fpid => $entity), $view_mode, $langcode);
+    entity_prepare_view('fieldable_panels_pane', array($entity->fpid => $entity), $langcode);
+    $entity->content = field_attach_view('fieldable_panels_pane', $entity, $view_mode, $langcode);
+    $entity->content += array(
       '#theme' => 'fieldable_panels_pane',
-      '#element' => $pane,
+      '#element' => $entity,
       '#view_mode' => $view_mode,
       '#language' => $langcode,
     );
 
-    return drupal_render($pane->content);
+    return drupal_render($entity->content);
   }
 
   public function delete($fpids) {

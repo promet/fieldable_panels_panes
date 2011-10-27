@@ -18,9 +18,11 @@ function fieldable_panels_panes_entity_info() {
       'label' => t('Fieldable panel pane'),
       'controller class' => 'PanelsPaneController',
       'base table' => 'fieldable_panels_panes',
+      'revision table' => 'fieldable_panels_panes_revision',
       'fieldable' => TRUE,
       'entity keys' => array(
         'id' => 'fpid',
+        'revision' => 'vid',
         'bundle' => 'bundle',
         'label' => 'admin_title',
       ),
@@ -52,6 +54,35 @@ function fieldable_panels_panes_entity_info() {
       'access callback' => 'fieldable_panels_panes_access',
     ),
   );
+}
+
+/**
+ * Implements hook_fied_extra_fields().
+ */
+function fieldable_panels_panes_field_extra_fields() {
+  $extra = array();
+
+  $entity_info = entity_get_info('fieldable_panels_pane');
+  foreach ($entity_info['bundles'] as $bundle => $info) {
+    $extra['fieldable_panels_pane'][$bundle] = array(
+      'form' => array(
+        'title' => array(
+          'label' => t('Title'),
+          'description' => t('The displayed title of the entity.'),
+          'weight' => -5,
+        ),
+      ),
+      'display' => array(
+        'title' => array(
+          'label' => t('Title'),
+          'description' => t('The displayed title of the entity.'),
+          'weight' => -5,
+        ),
+      ),
+    );
+  }
+
+  return $extra;
 }
 
 /**
@@ -172,7 +203,6 @@ function fieldable_panels_panes_permission() {
 
   $entity_info = entity_get_info('fieldable_panels_pane');
   foreach ($entity_info['bundles'] as $bundle => $info) {
-
     $perms["create fieldable $bundle"] = array(
       'title' => t('Create new %type', array('%type' => $info['label'])),
       'description' => t('Allows users to create new fieldable panel pane entities of bundle %type.', array('%type' => $info['label'])),
@@ -361,13 +391,17 @@ function fieldable_panels_panes_preprocess_fieldable_panels_pane(&$vars) {
  *
  * @see entity_load().
  */
-function fieldable_panels_panes_load($fpid) {
+function fieldable_panels_panes_load($fpid, $vid = NULL) {
   if (!is_numeric($fpid)) {
     return FALSE;
   }
 
-  $entities = fieldable_panels_panes_load_multiple(array($fpid));
-  return array_pop($entities);
+  $conditions = (isset($vid) ? array('vid' => $vid) : array());
+
+  $entities = fieldable_panels_panes_load_multiple(array($fpid), $conditions);
+  if ($entities) {
+    return reset($entities);
+  }
 }
 
 /**
