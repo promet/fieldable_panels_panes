@@ -99,13 +99,7 @@ function fieldable_panels_panes_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'created' => array(
-        'description' => 'The Unix timestamp when the revision was created.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-      ),
-      'changed' => array(
+      'timestamp' => array(
         'description' => 'The Unix timestamp when the revision was most recently saved.',
         'type' => 'int',
         'not null' => TRUE,
@@ -122,6 +116,11 @@ function fieldable_panels_panes_schema() {
         'description' => 'The title of the entity.',
         'type' => 'varchar',
         'length' => 255,
+      ),
+      'log' => array(
+        'description' => t('A log message associated with the revision.'),
+        'type' => 'text',
+        'size' => 'big',
       ),
     ),
     'primary key' => array('vid'),

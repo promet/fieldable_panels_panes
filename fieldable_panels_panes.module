@@ -551,6 +551,10 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
     '#weight' => 10,
   );
 
+  $form['revision'] = array(
+    '#weight' => 11,
+  );
+
   $form['reusable']['reusable'] = array(
     '#type' => 'checkbox',
     '#title' => t('Make this entity reusable'),
@@ -580,6 +584,21 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
     '#description' => t('A description of what this content is, does or is for, for administrative use.'),
     '#dependency' => array('edit-reusable' => array(1)),
     '#default_value' => $entity->admin_description,
+  );
+
+  $form['revision']['revision'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Create a new revision'),
+    '#default_value' => TRUE,
+    '#id' => 'edit-revision',
+  );
+
+  $form['revision']['log'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Log message'),
+    '#description' => t('Provide a description of the revision.'),
+    '#dependency' => array('edit-revision' => array(1)),
+    '#default_value' => '',
   );
 
   field_attach_form('fieldable_panels_pane', $entity, $form, $form_state);
@@ -617,6 +636,10 @@ function fieldable_panels_panes_entity_edit_form_submit($form, &$form_state) {
   $entity->category = $form_state['values']['category'];
   $entity->admin_title = $form_state['values']['admin_title'];
   $entity->admin_description = $form_state['values']['admin_description'];
+  $entity->revision = $form_state['values']['revision'];
+
+  $entity->reusable = $form_state['values']['reusable'];
+  $entity->log = $form_state['values']['log'];
 
   field_attach_submit('fieldable_panels_pane', $entity, $form, $form_state);
 

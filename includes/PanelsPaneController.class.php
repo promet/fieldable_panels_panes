@@ -57,30 +57,47 @@ class PanelsPaneController extends DrupalDefaultEntityController {
 
   public function save($entity) {
     $entity = (object) $entity;
-   // Determine if we will be inserting a new artwork.
-    $entity->is_new = isset($entity->fpid) && is_numeric($entity->fpid);
+   // Determine if we will be inserting a new entity.
+    $entity->is_new = !(isset($entity->fpid) && is_numeric($entity->fpid));
 
     $transaction = db_transaction();
 
+    // Set the timestamp fields.
+    if (empty($entity->created)) {
+      $entity->created = REQUEST_TIME;
+    }
+    $entity->changed = REQUEST_TIME;
+    $entity->timestamp = REQUEST_TIME;
+
     field_attach_presave('fieldable_panels_pane', $entity);
 
-    // When saving a new artwork revision, unset any existing $entity->vid
+    // When saving a new entity revision, unset any existing $entity->vid
     // to ensure a new revision will actually be created and store the old
-    // revision ID in a separate property for artwork hook implementations.
+    // revision ID in a separate property for entity hook implementations.
     if (!$entity->is_new && !empty($entity->revision) && $entity->vid) {
       $entity->old_vid = $entity->vid;
       unset($entity->vid);
     }
 
     try {
-      $this->saveRevision($entity);
-
       if (!$entity->is_new) {
+        // Since we already have an fpid, write the revision to ensure the
+        // vid is the most up to date, then write the record.
+        $this->saveRevision($entity);
         drupal_write_record('fieldable_panels_panes', $entity, 'fpid');
         field_attach_update('fieldable_panels_pane', $entity);
       }
       else {
+        // If this is new, write the record first so we have an fpid,
+        // then save the revision so that we have a vid. This means we
+        // then have to write the vid again.
         drupal_write_record('fieldable_panels_panes', $entity);
+        $this->saveRevision($entity);
+        db_update('fieldable_panels_panes')
+          ->fields(array('vid' => $entity->vid))
+          ->condition('fpid', $entity->fpid)
+          ->execute();
+
         field_attach_insert('fieldable_panels_pane', $entity);
       }
 
@@ -89,10 +106,37 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     catch (Exception $e) {
       $transaction->rollback('fieldable_panels_panes');
       watchdog_exception('fieldable_panels_panes', $e);
-      throw $e;
     }
 
     return FALSE;
+  }
+
+  /**
+   * Saves an entity revision with the uid of the current user.
+   *
+   * @param $entity
+   *   The fully loaded entity object.
+   * @param $uid
+   *   The user's uid for the current revision.
+   * @param $update
+   *   TRUE or FALSE indicating whether or not the existing revision should be
+   *     updated instead of a new one created.
+   */
+  function saveRevision($entity, $uid = NULL) {
+    if (!isset($uid)) {
+      $uid = $GLOBALS['user']->uid;
+    }
+
+    $entity->uid = $uid;
+    // Update the existing revision if specified.
+    if (!empty($entity->vid)) {
+      drupal_write_record('fieldable_panels_panes_revision', $entity, 'vid');
+    }
+    else {
+      // Otherwise insert a new revision. This will automatically update $entity
+      // to include the vid.
+      drupal_write_record('fieldable_panels_panes_revision', $entity);
+    }
   }
 
   public function view($entity, $view_mode = 'full', $langcode = NULL) {
