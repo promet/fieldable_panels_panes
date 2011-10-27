@@ -15,7 +15,7 @@
 function fieldable_panels_panes_entity_info() {
   return array(
     'fieldable_panels_pane' => array(
-      'label' => t('Panels Pane'),
+      'label' => t('Fieldable panel pane'),
       'controller class' => 'PanelsPaneController',
       'base table' => 'fieldable_panels_panes',
       'fieldable' => TRUE,
@@ -163,24 +163,31 @@ function fieldable_panels_panes_menu() {
  * Implements hook_permission()
  */
 function fieldable_panels_panes_permission() {
-  return array(
-    'create fieldable panels panes' => array(
-      'title' => t('Create fieldable panels panes'),
-      'description' => t('Allows users to create new fieldable panel pane entities.'),
-    ),
-    'edit fieldable panels panes' => array(
-      'title' => t('Edit fieldable panels panes'),
-      'description' => t('This permission allows users to edit fieldable panel pane entities. This is a minimum permission; it is required to be able to edit a fieldable pane at all, but higher access requirements on an individual pane can override it.'),
-    ),
-    'delete fieldable panels panes' => array(
-      'title' => t('Delete fieldable panels panes'),
-      'description' => t('Allows users to delete fieldable panel pane entities. Users must also be able to edit the pane to delete it.'),
-    ),
+  $perms = array(
     'administer fieldable panels panes' => array(
       'title' => t('Administer fieldable panels panes'),
       'description' => t('Allows users complete control over fieldable panel pane entities. This permission overrides any other permission.'),
     ),
   );
+
+  $entity_info = entity_get_info('fieldable_panels_pane');
+  foreach ($entity_info['bundles'] as $bundle => $info) {
+
+    $perms["create fieldable $bundle"] = array(
+      'title' => t('Create new %type', array('%type' => $info['label'])),
+      'description' => t('Allows users to create new fieldable panel pane entities of bundle %type.', array('%type' => $info['label'])),
+    );
+    $perms["edit fieldable $bundle"] = array(
+      'title' => t('Edit %type', array('%type' => $info['label'])),
+      'description' => t('Allows users to edit fieldable panel pane entities of bundle %type. This is a minimum permission; it is required to be able to edit a fieldable pane at all, but higher access requirements on an individual pane can override it.', array('%type' => $info['label'])),
+    );
+    $perms["delete fieldable $bundle"] = array(
+      'title' => t('Delete %type', array('%type' => $info['label'])),
+      'description' => t('Allows users to delete fieldable panel pane entities of bundle %type. Users must also be able to edit the pane to delete it.', array('%type' => $info['label'])),
+    );
+  }
+
+  return $perms;
 }
 
 /**

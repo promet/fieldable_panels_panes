@@ -3,11 +3,6 @@
  * Field handler to present a link node edit.
  */
 class fieldable_panels_panes_handler_field_edit_entity extends fieldable_panels_panes_handler_field_view_entity {
-
-  function access() {
-    return user_access('edit fieldable panels panes');
-  }
-
   /**
    * Renders the link.
    */

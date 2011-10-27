@@ -3,11 +3,6 @@
  * Field handler to present a link node delete.
  */
 class fieldable_panels_panes_handler_field_delete_entity extends fieldable_panels_panes_handler_field_view_entity {
-
-  function access() {
-    return user_access('delete fieldable panels panes');
-  }
-
   /**
    * Renders the link.
    */

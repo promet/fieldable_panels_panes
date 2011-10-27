@@ -44,11 +44,11 @@ class PanelsPaneController extends DrupalDefaultEntityController {
 
       case 'update':
         ctools_include('context');
-        return user_access('edit fieldable panels panes') && ctools_access($entity->edit_access, fieldable_panels_panes_get_base_context($entity));
+        return user_access('edit fieldable ' . $entity->bundle) && ctools_access($entity->edit_access, fieldable_panels_panes_get_base_context($entity));
 
       case 'delete':
         ctools_include('context');
-        return user_access('delete fieldable panels panes') && ctools_access($entity->edit_access, fieldable_panels_panes_get_base_context($entity));
+        return user_access('delete fieldable ' . $entity->bundle) && ctools_access($entity->edit_access, fieldable_panels_panes_get_base_context($entity));
 
     }
 
