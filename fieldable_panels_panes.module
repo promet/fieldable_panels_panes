@@ -651,7 +651,7 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
 
   $form['revision']['revision'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Create a new revision'),
+    '#title' => t('Create new revision'),
     '#default_value' => TRUE,
     '#id' => 'edit-revision',
   );
@@ -664,7 +664,7 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
   $form['revision']['log'] = array(
     '#type' => 'textarea',
     '#title' => t('Log message'),
-    '#description' => t('Provide a description of the revision.'),
+    '#description' => t('Provide an explanation of the changes you are making. This will help other authors understand your motivations.'),
     '#dependency' => array('edit-revision' => array(1)),
     '#default_value' => '',
   );
