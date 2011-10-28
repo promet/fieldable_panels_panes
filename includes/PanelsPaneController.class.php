@@ -24,6 +24,15 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     }
   }
 
+  public function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
+    // Add an alias to this query to ensure that we can tell if this is
+    // the current revision or not.
+    $query = parent::buildQuery($ids, $conditions, $revision_id);
+    $query->addField('base', 'vid', 'current_vid');
+
+    return $query;
+  }
+
   public function access($op, $entity = NULL, $account = NULL) {
     if ($op !== 'create' && !$entity) {
       return FALSE;
@@ -57,7 +66,7 @@ class PanelsPaneController extends DrupalDefaultEntityController {
 
   public function save($entity) {
     $entity = (object) $entity;
-   // Determine if we will be inserting a new entity.
+     // Determine if we will be inserting a new entity.
     $entity->is_new = !(isset($entity->fpid) && is_numeric($entity->fpid));
 
     $transaction = db_transaction();
@@ -66,8 +75,13 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     if (empty($entity->created)) {
       $entity->created = REQUEST_TIME;
     }
+
+    // Only change revision timestamp if it doesn't exist.
+    if (empty($entity->timestamp)) {
+      $entity->timestamp = REQUEST_TIME;
+    }
+
     $entity->changed = REQUEST_TIME;
-    $entity->timestamp = REQUEST_TIME;
 
     field_attach_presave('fieldable_panels_pane', $entity);
 
@@ -85,6 +99,7 @@ class PanelsPaneController extends DrupalDefaultEntityController {
         // vid is the most up to date, then write the record.
         $this->saveRevision($entity);
         drupal_write_record('fieldable_panels_panes', $entity, 'fpid');
+
         field_attach_update('fieldable_panels_pane', $entity);
       }
       else {

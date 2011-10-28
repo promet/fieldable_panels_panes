@@ -13,3 +13,10 @@ files[] = plugins/views/fieldable_panels_panes_handler_field_delete_entity.inc
 files[] = plugins/views/fieldable_panels_panes_handler_field_edit_entity.inc
 files[] = plugins/views/fieldable_panels_panes_handler_field_view_entity.inc
 files[] = plugins/views/fieldable_panels_panes_handler_filter_bundle.inc
+
+files[] = plugins/views/fieldable_panels_panes_handler_field_delete_revision.inc
+files[] = plugins/views/fieldable_panels_panes_handler_field_edit_revision.inc
+files[] = plugins/views/fieldable_panels_panes_handler_field_view_revision.inc
+
+files[] = plugins/views/fieldable_panels_panes_handler_field_is_current.inc
+files[] = plugins/views/fieldable_panels_panes_handler_field_make_current.inc

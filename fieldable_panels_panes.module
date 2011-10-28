@@ -156,13 +156,72 @@ function fieldable_panels_panes_menu() {
   ) + $base;
 
   $items['admin/structure/panels/entity/view/%fieldable_panels_panes/delete'] = array(
-    'title' => 'delete',
+    'title' => 'Delete',
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('fieldable_panels_panes_entity_delete_form', 5),
     'access callback' => 'fieldable_panels_panes_access',
     'access arguments' => array('delete', 5),
     'weight' => -8,
+  ) + $base;
+
+  $items['admin/structure/panels/entity/view/%fieldable_panels_panes/revision'] = array(
+    'title' => 'Revisions',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'fieldable_panels_panes_entity_list_revisions_page',
+    'page arguments' => array(5),
+    'access callback' => 'fieldable_panels_panes_access',
+    'access arguments' => array('delete', 5),
+    'weight' => -7,
+  ) + $base;
+
+  $items['admin/structure/panels/entity/view/%fieldable_panels_panes/revision/%'] = array(
+    'title callback' => 'fieldable_panels_panes_entity_title',
+    'title arguments' => array(5),
+    'page callback' => 'fieldable_panels_panes_entity_view_page',
+    'page arguments' => array(5),
+    'access callback' => 'fieldable_panels_panes_access',
+    'access arguments' => array('view', 5),
+    'load arguments' => array(7),
+  ) + $base;
+
+  $items['admin/structure/panels/entity/view/%fieldable_panels_panes/revision/%/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  ) + $base;
+
+  $items['admin/structure/panels/entity/view/%fieldable_panels_panes/revision/%/edit'] = array(
+    'title' => 'Edit',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'fieldable_panels_panes_entity_edit_page',
+    'page arguments' => array(5),
+    'access callback' => 'fieldable_panels_panes_access',
+    'access arguments' => array('update', 5),
+    'weight' => -8,
+    'load arguments' => array(7),
+  ) + $base;
+
+  $items['admin/structure/panels/entity/view/%fieldable_panels_panes/revision/%/delete'] = array(
+    'title' => 'Delete',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('fieldable_panels_panes_entity_delete_revision_form', 5),
+    'access callback' => 'fieldable_panels_panes_access',
+    'access arguments' => array('delete', 5),
+    'weight' => -7,
+    'load arguments' => array(7),
+  ) + $base;
+
+  $items['admin/structure/panels/entity/view/%fieldable_panels_panes/revision/%/make-current'] = array(
+    'title' => 'Edit',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'fieldable_panels_panes_entity_make_current_page',
+    'page arguments' => array(5),
+    'access callback' => 'fieldable_panels_panes_access',
+    'access arguments' => array('update', 5),
+    'weight' => -8,
+    'load arguments' => array(7),
   ) + $base;
 
   $items['admin/structure/panels/entity/manage/%fieldable_panels_panes_type'] = array(
@@ -597,6 +656,11 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
     '#id' => 'edit-revision',
   );
 
+  if (!user_access('administer fieldable panels panes') || $entity->vid != $entity->current_vid) {
+    $form['revision']['revision']['#disabled'] = TRUE;
+    $form['revision']['revision']['#value'] = TRUE;
+  }
+
   $form['revision']['log'] = array(
     '#type' => 'textarea',
     '#title' => t('Log message'),
@@ -640,10 +704,13 @@ function fieldable_panels_panes_entity_edit_form_submit($form, &$form_state) {
   $entity->category = $form_state['values']['category'];
   $entity->admin_title = $form_state['values']['admin_title'];
   $entity->admin_description = $form_state['values']['admin_description'];
-  $entity->revision = $form_state['values']['revision'];
 
-  $entity->reusable = $form_state['values']['reusable'];
-  $entity->log = $form_state['values']['log'];
+  $entity->revision = $form_state['values']['revision'];
+  // Only set a log message if there was a new revision. This prevents
+  // overwriting a log message on the current revision
+  if ($entity->revision) {
+    $entity->log = $form_state['values']['log'];
+  }
 
   field_attach_submit('fieldable_panels_pane', $entity, $form, $form_state);
 

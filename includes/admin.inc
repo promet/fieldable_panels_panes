@@ -66,7 +66,6 @@ function fieldable_panels_panes_entities_page() {
  */
 function fieldable_panels_panes_entities_list_page($type) {
   return views_embed_view('fieldable_pane_entities', 'default', $type);
-  return t('The list page still needs to be implemented.');
 }
 
 /**
@@ -183,3 +182,34 @@ function fieldable_panels_panes_entity_edit_access_page($op, $entity) {
 
   return $output;
 }
+
+/**
+ * List all entities for the given type.
+ */
+function fieldable_panels_panes_entity_list_revisions_page($entity) {
+  return views_embed_view('fieldable_pane_entity_revisions', 'default', $entity->fpid);
+}
+
+/**
+ * Callback to make a revision current.
+ *
+ * This is an operation only and has no output; it is assumed a destination
+ * will be provided, though it will go ahead and redirect you to the view of
+ * the entity.
+ *
+ * It is token protected.
+ */
+function fieldable_panels_panes_entity_make_current_page($entity) {
+  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], $entity->fpid . ':' . $entity->vid)) {
+    return MENU_ACCESS_DENIED;
+  }
+
+  // Since this was loaded with a different revision, a simple save will make
+  // that current without creating a new revision or disturbing the 'current'
+  // revision.
+  fieldable_panels_panes_save($entity);
+
+  drupal_set_message(t('The revision has been made current.'));
+  drupal_goto("admin/structure/panels/entity/view/$entity->fpid");
+}
+
