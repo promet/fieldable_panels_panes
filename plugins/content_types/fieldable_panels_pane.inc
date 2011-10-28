@@ -110,6 +110,14 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form($fo
     return $form;
   }
 
+  // If we are adding an existing entity, fake the form into thinking that
+  // it has simply executed as we are not actually using the form.
+  if ($form_state['op'] == 'add' && !empty($form_state['subtype']['entity_id'])) {
+    $form_state['executed'] = TRUE;
+    $form_state['complete'] = TRUE;
+    return;
+  }
+
   // @todo: This really should be in CTools, if possible, in order to ensure AJAX works
   // everywhere.
 
@@ -210,6 +218,8 @@ function _fieldable_panels_panes_custom_content_type($entity) {
     'description' => check_plain($entity->admin_description),
     'category' => $entity->category ? check_plain($entity->category) : t('Miscellaneous'),
     'all contexts' => TRUE,
+    // Prevent editing/creating revisions when adding this to a display.
+    'add form' => '',
     'icon' => 'icon_block_custom.png',
   );
 
