@@ -212,6 +212,8 @@ class PanelsPaneController extends DrupalDefaultEntityController {
       'admin_title' => '',
       'admin_description' => '',
       'category' => '',
+      'vid' => '',
+      'current_vid' => '',
     );
 
     // Apply the given values.
