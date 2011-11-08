@@ -5,17 +5,27 @@
  *
  * CTools content type to render a fielded panel pane.
  */
-$plugin = array(
-  'title' => t('Fielded custom content'),
-  'no title override' => TRUE,
-  'description' => t('Create custom panels pane with fields'),
-  'category' => t('Fielded panes'),
-  'all contexts' => TRUE,
-  'defaults' => array(),
-  'edit form' => 'fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form',
-  'edit text' => t('Edit'),
-);
 
+/**
+ * Small hook implementation of plugin.
+ *
+ * We have to use this because the form here can be loaded via form
+ * caching and if this .inc file is loaded before the plugin is
+ * requested, the $plugin = array() notation doesn't work.
+ */
+
+function fieldable_panels_panes_fieldable_panels_pane_ctools_content_types() {
+  return array(
+    'title' => t('Fielded custom content'),
+    'no title override' => TRUE,
+    'description' => t('Create custom panels pane with fields'),
+    'category' => t('Fielded panes'),
+    'all contexts' => TRUE,
+    'defaults' => array(),
+    'edit form' => 'fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form',
+    'edit text' => t('Edit'),
+  );
+}
 // --------------------------------------------------------------------------
 // Callbacks, many of them automatically named, for rendering content.
 
