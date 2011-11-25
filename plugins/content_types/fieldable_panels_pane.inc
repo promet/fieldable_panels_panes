@@ -68,10 +68,10 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_content_types
  */
 function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subtype, $conf, $panel_args, $context) {
   $entity = fieldable_panels_panes_load_entity($subtype);
-  if ($entity && fieldable_panels_panes_access('view', $entity)) {
+  if ($entity && !empty($entity->fpid) && fieldable_panels_panes_access('view', $entity)) {
     $settings = field_bundle_settings('fieldable_panels_pane', $entity->bundle);
     $block = new stdClass();
-    if ($settings['extra_fields']['display']['title']['default']['visible']) {
+    if (empty($settings['extra_fields']['display']) || !empty($settings['extra_fields']['display']['title']['default']['visible'])) {
       $block->title = !empty($entity->title) ? filter_xss_admin($entity->title) : '';
     }
     $block->content = fieldable_panels_panes_view($entity);
