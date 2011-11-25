@@ -84,6 +84,7 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     $entity->changed = REQUEST_TIME;
 
     field_attach_presave('fieldable_panels_pane', $entity);
+    module_invoke_all('entity_presave', $entity, 'fieldable_panels_pane');
 
     // When saving a new entity revision, unset any existing $entity->vid
     // to ensure a new revision will actually be created and store the old
@@ -101,6 +102,8 @@ class PanelsPaneController extends DrupalDefaultEntityController {
         drupal_write_record('fieldable_panels_panes', $entity, 'fpid');
 
         field_attach_update('fieldable_panels_pane', $entity);
+        module_invoke_all('entity_update', $entity, 'fieldable_panels_pane');
+
       }
       else {
         // If this is new, write the record first so we have an fpid,
@@ -114,6 +117,7 @@ class PanelsPaneController extends DrupalDefaultEntityController {
           ->execute();
 
         field_attach_insert('fieldable_panels_pane', $entity);
+        module_invoke_all('entity_insert', $entity, 'fieldable_panels_pane');
       }
 
       return $entity;
@@ -175,13 +179,13 @@ class PanelsPaneController extends DrupalDefaultEntityController {
       $entities = fieldable_panels_panes_load_multiple($fpids, array());
 
       try {
-        foreach ($entities as $fpid => $node) {
-          // Call the node-specific callback (if any):
-          module_invoke_all('entity_delete', $node, 'fieldable_panels_pane');
-          field_attach_delete('fieldable_panels_pane', $node);
+        foreach ($entities as $fpid => $entity) {
+          // Call the entity-specific callback (if any):
+          module_invoke_all('entity_delete', $entity, 'fieldable_panels_pane');
+          field_attach_delete('fieldable_panels_pane', $entity);
         }
 
-        // Delete after calling hooks so that they can query node tables as needed.
+        // Delete after calling hooks so that they can query entity tables as needed.
         db_delete('fieldable_panels_panes')
           ->condition('fpid', $fpids, 'IN')
           ->execute();
@@ -192,7 +196,7 @@ class PanelsPaneController extends DrupalDefaultEntityController {
         throw $e;
       }
 
-      // Clear the page and block and node_load_multiple caches.
+      // Clear the page and block and entity_load_multiple caches.
       entity_get_controller('fieldable_panels_pane')->resetCache();
     }
   }
