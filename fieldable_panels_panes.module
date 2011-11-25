@@ -120,8 +120,12 @@ function fieldable_panels_panes_menu() {
   ) + $base;
 
   $items['admin/structure/panels/entity/view/%fieldable_panels_panes/view'] = array(
-    'title' => 'View',
+    'title' => 'Preview',
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'page callback' => 'fieldable_panels_panes_entity_view_page',
+    'page arguments' => array(5),
+    'access callback' => 'fieldable_panels_panes_access',
+    'access arguments' => array('view', 5),
     'weight' => -10,
   ) + $base;
 
@@ -188,6 +192,11 @@ function fieldable_panels_panes_menu() {
   $items['admin/structure/panels/entity/view/%fieldable_panels_panes/revision/%/view'] = array(
     'title' => 'View',
     'type' => MENU_DEFAULT_LOCAL_TASK,
+    'page callback' => 'fieldable_panels_panes_entity_view_page',
+    'page arguments' => array(5),
+    'access callback' => 'fieldable_panels_panes_access',
+    'access arguments' => array('view', 5),
+    'load arguments' => array(7),
     'weight' => -10,
   ) + $base;
 
@@ -214,8 +223,8 @@ function fieldable_panels_panes_menu() {
   ) + $base;
 
   $items['admin/structure/panels/entity/view/%fieldable_panels_panes/revision/%/make-current'] = array(
-    'title' => 'Edit',
-    'type' => MENU_LOCAL_TASK,
+    'title' => 'Make current',
+    'type' => MENU_CALLBACK,
     'page callback' => 'fieldable_panels_panes_entity_make_current_page',
     'page arguments' => array(5),
     'access callback' => 'fieldable_panels_panes_access',

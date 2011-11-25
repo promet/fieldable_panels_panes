@@ -92,6 +92,7 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     if (!$entity->is_new && !empty($entity->revision) && $entity->vid) {
       $entity->old_vid = $entity->vid;
       unset($entity->vid);
+      $entity->timestamp = REQUEST_TIME;
     }
 
     try {
