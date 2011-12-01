@@ -17,3 +17,10 @@ function MYMODULE_entity_info_alter(&$entity_info) {
     ),
   );
 }
+
+Fields are then added to your bundle as normal through the Manage Fields and 
+Display Fields tabs in the UI.
+
+You can use this hook to rename or remove the default bundle but remember that
+doing so will break any content currently using that bundle. If you do this
+be sure to also fix any content already using it.
