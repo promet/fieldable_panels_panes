@@ -112,7 +112,10 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form($fo
   $conf = &$form_state['conf'];
   $subtype_name = $form_state['subtype_name'];
 
-  $entity = $form_state['entity'] = fieldable_panels_panes_load_entity($subtype_name);
+  if (!isset($form_state['entity'])) {
+    $form_state['entity'] = fieldable_panels_panes_load_entity($subtype_name);
+  }
+  $entity = $form_state['entity'];
 
   // It's possible that we have a reference to an entity that is no longer valid.
   // If so, bail, because otherwise field API will whitescreen.
