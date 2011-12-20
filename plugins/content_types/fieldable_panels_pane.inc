@@ -280,7 +280,9 @@ function fieldable_panels_panes_load_entity($subtype_name) {
 function _fieldable_panels_panes_load_entity($subtype_name) {
   list($type, $id) = explode(':', $subtype_name);
   if ($type == 'uuid' && module_exists('uuid')) {
-    $content = entity_uuid_load($id);
+    if ($content = entity_uuid_load('fieldable_panels_pane', array($id))) {
+      $content = reset($content);
+    }
   }
   else {
     $content = fieldable_panels_panes_load($id);

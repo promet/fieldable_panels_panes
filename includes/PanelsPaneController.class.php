@@ -95,6 +95,8 @@ class PanelsPaneController extends DrupalDefaultEntityController {
       $entity->timestamp = REQUEST_TIME;
     }
 
+    module_invoke_all('entity_presave', $entity, 'fieldable_panels_pane');
+
     try {
       if (!$entity->is_new) {
         // Since we already have an fpid, write the revision to ensure the

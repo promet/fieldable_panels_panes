@@ -20,11 +20,14 @@ function fieldable_panels_panes_entity_info() {
       'base table' => 'fieldable_panels_panes',
       'revision table' => 'fieldable_panels_panes_revision',
       'fieldable' => TRUE,
+      'uuid' => module_exists('uuid'),
       'entity keys' => array(
         'id' => 'fpid',
         'revision' => 'vid',
         'bundle' => 'bundle',
         'label' => 'admin_title',
+        'uuid' => 'uuid',
+        'revision uuid' => 'vuuid',
       ),
       'bundles' => array(
         // @todo We need to store the possible bundles and create a UI.
@@ -52,6 +55,7 @@ function fieldable_panels_panes_entity_info() {
       'view callback' => 'entity_metadata_view_single',
       'creation callback' => 'fieldable_panels_panes_create',
       'access callback' => 'fieldable_panels_panes_access',
+      'save callback' => 'fieldable_panels_panes_save',
     ),
   );
 }

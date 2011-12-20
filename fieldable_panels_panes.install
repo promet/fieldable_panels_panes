@@ -82,6 +82,9 @@ function fieldable_panels_panes_schema() {
       'reusable' => array('reusable'),
     ),
   );
+  if (module_exists('uuid')) {
+    uuid_schema_generate($schema, 'fieldable_panels_panes');
+  }
 
   $schema['fieldable_panels_panes_revision'] = array(
     'description' => 'Entity revision table for panel pane content with fields.',
@@ -128,6 +131,42 @@ function fieldable_panels_panes_schema() {
       'fpid' => array('fpid', 'vid'),
     ),
   );
+  if (module_exists('uuid')) {
+    uuid_schema_generate($schema, 'fieldable_panels_panes_revision', 'vuuid');
+  }
 
   return $schema;
+}
+
+/**
+ * Add UUID support.
+ */
+function fieldable_panels_panes_update_7100() {
+  if (module_exists('uuid')) {
+    _fieldable_panels_panes_add_uuid();
+  }
+}
+
+/**
+ * Implements hook_modules_installed().
+ */
+function fieldable_panels_panes_modules_installed($modules) {
+  if (in_array('uuid', $modules)) {
+    _fieldable_panels_panes_add_uuid();
+  }
+}
+
+function _fieldable_panels_panes_add_uuid() {
+  $info = entity_get_info('fieldable_panels_pane');
+  if (isset($info['uuid']) && $info['uuid'] == TRUE) {
+    $schema = array();
+    // Add the UUID columns to the definition.
+    uuid_schema_alter($schema);
+    // Now add the actual UUID field.
+    uuid_add_field($schema, $info['base table']);
+    if (!empty($info['revision table'])) {
+      // Now add the actual VUUID field.
+      uuid_add_field($schema, $info['revision table']);
+    }
+  }
 }
