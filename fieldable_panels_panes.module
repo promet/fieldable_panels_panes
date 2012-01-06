@@ -20,7 +20,7 @@ function fieldable_panels_panes_entity_info() {
       'base table' => 'fieldable_panels_panes',
       'revision table' => 'fieldable_panels_panes_revision',
       'fieldable' => TRUE,
-      'uuid' => module_exists('uuid'),
+      'uuid' => TRUE,
       'entity keys' => array(
         'id' => 'fpid',
         'revision' => 'vid',

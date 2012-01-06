@@ -148,24 +148,29 @@ function fieldable_panels_panes_update_7100() {
 }
 
 /**
- * Implements hook_modules_installed().
+ * Check if we've already added the uuid field.
  */
-function fieldable_panels_panes_modules_installed($modules) {
-  if (in_array('uuid', $modules)) {
-    _fieldable_panels_panes_add_uuid();
+function _fieldable_panels_panes_uuid_exists($schema, $table) {
+  foreach ($schema[$table]['fields'] as $name => $field) {
+    if (db_field_exists($table, $name)) {
+      return TRUE;
+    }
   }
+  return FALSE;
 }
 
 function _fieldable_panels_panes_add_uuid() {
   $info = entity_get_info('fieldable_panels_pane');
   if (isset($info['uuid']) && $info['uuid'] == TRUE) {
     $schema = array();
-    // Add the UUID columns to the definition.
+    // Add the UUID columns to the (empty) definition.
     uuid_schema_alter($schema);
-    // Now add the actual UUID field.
-    uuid_add_field($schema, $info['base table']);
-    if (!empty($info['revision table'])) {
-      // Now add the actual VUUID field.
+    if (!_fieldable_panels_panes_uuid_exists($schema, $info['base table'])) {
+      // Add the UUID field in the database.
+      uuid_add_field($schema, $info['base table']);
+    }
+    if (!empty($info['revision table']) && !_fieldable_panels_panes_uuid_exists($schema, $info['revision table'])) {
+      // Add the VUUID field in the database.
       uuid_add_field($schema, $info['revision table']);
     }
   }
