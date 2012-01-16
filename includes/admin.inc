@@ -77,6 +77,8 @@ function fieldable_panels_panes_entities_add_page($type) {
     'add submit' => TRUE,
   );
 
+  // Default these to reusable.
+  $form_state['entity']->reusable = TRUE;
   return drupal_build_form('fieldable_panels_panes_entity_edit_form', $form_state);
 }
 
