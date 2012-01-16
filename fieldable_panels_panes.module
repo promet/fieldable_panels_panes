@@ -505,6 +505,32 @@ function fieldable_panels_panes_delete($fpid) {
 }
 
 /**
+ * Delete a revision for a fieldable panel pane.
+ *
+ * @param $fpid
+ *   A fieldable panel pane ID.
+ * @param $vid
+ *   The revision id to delete.
+ */
+function fieldable_panels_panes_delete_revision($fpid, $vid) {
+  if ($revision = fieldable_panels_panes_load($fpid, $vid)) {
+    // Prevent deleting the current revision.
+    $entity = fieldable_panels_panes_load($revision->fpid);
+    if ($vid == $entity->vid) {
+      return FALSE;
+    }
+
+    db_delete('fieldable_panels_panes_revision')
+      ->condition('fpid', $revision->fpid)
+      ->condition('vid', $revision->vid)
+      ->execute();
+    field_attach_delete_revision('fieldable_panels_pane', $revision);
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
  * Delete multiple fieldable panel panes.
  *
  * @param $fpids

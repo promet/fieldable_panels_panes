@@ -134,6 +134,38 @@ function fieldable_panels_panes_entity_delete_form_submit($form, &$form_state) {
 }
 
 /**
+ * Menu callback -- ask for confirmation of revision deletion
+ */
+function fieldable_panels_panes_entity_delete_revision_form($form, &$form_state, $entity) {
+  $form_state['entity'] = $entity;
+  return confirm_form($form,
+    t('Are you sure you want to delete the revision from %revision-date?', array('%revision-date' => format_date($entity->timestamp))),
+    'admin/structure/panels/entity/view/' . $entity->fpid,
+    t('This action cannot be undone.'),
+    t('Delete'),
+    t('Cancel')
+  );
+}
+
+/**
+ * Execute revision deletion
+ */
+function fieldable_panels_panes_entity_delete_revision_form_submit($form, &$form_state) {
+  if ($form_state['values']['confirm']) {
+    $entity = $form_state['entity'];
+    fieldable_panels_panes_delete_revision($entity->fpid, $entity->vid);
+    watchdog('fieldable_panels_pane', '@type: deleted revision of %title from %date.', array(
+      '@type' => $entity->bundle,
+      '%title' => $entity->title,
+      '%date' => format_date($entity->timestamp),
+    ));
+    drupal_set_message(t('The revision from %date has been deleted.', array('%date' => format_date($entity->timestamp))));
+  }
+
+  $form_state['redirect'] = 'admin/structure/panels/entity/view/' . $entity->fpid . '/revision';
+}
+
+/**
  * Page callback to edit access control of an entity pane.
  *
  * @param $op
