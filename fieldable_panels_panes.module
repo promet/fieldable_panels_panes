@@ -455,6 +455,16 @@ function fieldable_panels_panes_preprocess_fieldable_panels_pane(&$vars) {
   }
 }
 
+/**
+ * Add a class for our bundle to the normal panels pane theme.
+ */
+function fieldable_panels_panes_preprocess_panels_pane(&$vars) {
+  if ($vars['pane']->type == 'fieldable_panels_pane') {
+    $entity = fieldable_panels_panes_load_entity($vars['pane']->subtype);
+    $vars['classes_array'][] = 'pane-bundle-' . ctools_cleanstring($entity->bundle, array('lower case' => TRUE));
+  }
+}
+
 // -------------------------------------------------------------------------
 // Database and general entity API functions
 
