@@ -7,6 +7,7 @@ will look something like this:
 function MYMODULE_entity_info_alter(&$entity_info) {
   $entity_info['fieldable_panels_pane']['bundles']['my_bundle_name'] = array(
     'label' => t('My bundle name'),
+    'pane category' => t('My category name'),
     'admin' => array(
       'path' => 'admin/structure/panels/entity/manage/%fieldable_panels_panes_type',
       'bundle argument' => 5,

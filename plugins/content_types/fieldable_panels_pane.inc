@@ -215,7 +215,7 @@ function _fieldable_panels_panes_default_content_type() {
     $types[$bundle] = array(
       'name' => $bundle,
       'title' => $info['label'],
-      'category' => t('Fielded panes'),
+      'category' => !empty($info['pane category']) ? $info['pane category'] : t('Fielded panes'),
       'description' => t('Create a new custom entity.'),
       'all contexts' => TRUE,
       'bundle' => $bundle,
