@@ -701,7 +701,7 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
   $form['revision']['revision'] = array(
     '#type' => 'checkbox',
     '#title' => t('Create new revision'),
-    '#default_value' => TRUE,
+    '#default_value' => 1,
     '#id' => 'edit-revision',
   );
 

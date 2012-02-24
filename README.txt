@@ -8,6 +8,8 @@ function MYMODULE_entity_info_alter(&$entity_info) {
   $entity_info['fieldable_panels_pane']['bundles']['my_bundle_name'] = array(
     'label' => t('My bundle name'),
     'pane category' => t('My category name'),
+    'pane top level' => FALSE, // set to true to make this show as a top level icon
+    'pane icon' => '/path/to/custom/icon/for/this/pane.png',
     'admin' => array(
       'path' => 'admin/structure/panels/entity/manage/%fieldable_panels_panes_type',
       'bundle argument' => 5,
