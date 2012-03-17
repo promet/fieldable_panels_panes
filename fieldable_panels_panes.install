@@ -76,15 +76,18 @@ function fieldable_panels_panes_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'uuid' => array(
+        'type' => 'char',
+        'length' => 36,
+        'default' => '',
+        'description' => 'The Universally Unique Identifier.',
+      ),
     ),
     'primary key' => array('fpid'),
     'indexes' => array(
       'reusable' => array('reusable'),
     ),
   );
-  if (module_exists('uuid')) {
-    uuid_schema_generate($schema, 'fieldable_panels_panes');
-  }
 
   $schema['fieldable_panels_panes_revision'] = array(
     'description' => 'Entity revision table for panel pane content with fields.',
@@ -125,53 +128,34 @@ function fieldable_panels_panes_schema() {
         'type' => 'text',
         'size' => 'big',
       ),
+      'vuuid' => array(
+        'type' => 'char',
+        'length' => 36,
+        'default' => '',
+        'description' => 'The Universally Unique Identifier.',
+      ),
     ),
     'primary key' => array('vid'),
     'indexes' => array(
       'fpid' => array('fpid', 'vid'),
     ),
   );
-  if (module_exists('uuid')) {
-    uuid_schema_generate($schema, 'fieldable_panels_panes_revision', 'vuuid');
-  }
 
   return $schema;
 }
 
-/**
- * Add UUID support.
- */
-function fieldable_panels_panes_update_7100() {
-  if (module_exists('uuid')) {
-    _fieldable_panels_panes_add_uuid();
-  }
-}
+  /**
+   * Add UUID support.
+   */
+function fieldable_panels_panes_update_7101(&$sandbox) {
 
-/**
- * Check if we've already added the uuid field.
- */
-function _fieldable_panels_panes_uuid_exists($schema, $table) {
-  foreach ($schema[$table]['fields'] as $name => $field) {
-    if (db_field_exists($table, $name)) {
-      return TRUE;
-    }
+  // Make sure to add UUID field
+  if (!db_field_exists('fieldable_panels_panes', 'uuid')) {
+    db_add_field('fieldable_panels_panes', 'uuid', array('type' => 'char', 'length' => 36, 'default' => '', 'description' => 'The Universally Unique Identifier.'));
   }
-  return FALSE;
-}
 
-function _fieldable_panels_panes_add_uuid() {
-  $info = entity_get_info('fieldable_panels_pane');
-  if (isset($info['uuid']) && $info['uuid'] == TRUE) {
-    $schema = array();
-    // Add the UUID columns to the (empty) definition.
-    uuid_schema_alter($schema);
-    if (!_fieldable_panels_panes_uuid_exists($schema, $info['base table'])) {
-      // Add the UUID field in the database.
-      uuid_add_field($schema, $info['base table']);
-    }
-    if (!empty($info['revision table']) && !_fieldable_panels_panes_uuid_exists($schema, $info['revision table'])) {
-      // Add the VUUID field in the database.
-      uuid_add_field($schema, $info['revision table']);
-    }
+  // Make sure to add VUUID field
+  if (!db_field_exists('fieldable_panels_panes_revision', 'vuuid')) {
+    db_add_field('fieldable_panels_panes_revision', 'vuuid', array('type' => 'char', 'length' => 36, 'default' => '', 'description' => 'The Universally Unique Identifier.'));
   }
 }
