@@ -192,6 +192,10 @@ class PanelsPaneController extends DrupalDefaultEntityController {
         db_delete('fieldable_panels_panes')
           ->condition('fpid', $fpids, 'IN')
           ->execute();
+
+        db_delete('fieldable_panels_panes_revision')
+          ->condition('fpid', $fpids, 'IN')
+          ->execute();
       }
       catch (Exception $e) {
         $transaction->rollback();
