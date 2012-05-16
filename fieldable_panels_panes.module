@@ -366,7 +366,11 @@ function fieldable_panels_panes_entity_title($entity) {
  * Implements hook_ctools_plugin_directory()
  */
 function fieldable_panels_panes_ctools_plugin_directory($owner, $plugin_type) {
-  if ($owner = 'ctools' && $plugin_type == 'content_types') {
+  if ($owner == 'ctools' && $plugin_type == 'content_types') {
+    return 'plugins/' . $plugin_type;
+  }
+
+  if ($owner == 'panelizer' && defined('PANELIZER_VERSION') && version_compare(PANELIZER_VERSION, '3.0', '>=')) {
     return 'plugins/' . $plugin_type;
   }
 }
