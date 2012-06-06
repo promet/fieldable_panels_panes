@@ -300,7 +300,7 @@ function fieldable_panels_panes_theme() {
     'fieldable_panels_pane' => array(
       'render element' => 'elements',
       'variable'  => array(
-        'element'  => null,
+        'element'  => NULL,
       ),
       'template'  => 'fieldable-panels-pane',
     ),
@@ -491,7 +491,7 @@ function fieldable_panels_panes_preprocess_fieldable_panels_pane(&$vars) {
   field_attach_preprocess('fieldable_panels_pane', $vars['elements']['#element'], $vars['content'], $vars);
 
   $vars['fields'] = '';
-  foreach($vars['content'] as $content) {
+  foreach ($vars['content'] as $content) {
     $vars['fields'] .= render($content);
   }
 }
