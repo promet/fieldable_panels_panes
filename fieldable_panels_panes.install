@@ -175,3 +175,11 @@ function fieldable_panels_panes_update_7102(&$sandbox) {
     ->condition('fpid', $existing, 'NOT IN')
     ->execute();
 }
+
+/**
+ * Reset the theme registry.
+ */
+function fieldable_panels_panes_update_7103(&$sandbox) {
+  // All caches are flushed during the update process, so we do nothing.
+  return t('Theme registry cache has been cleared.');
+}

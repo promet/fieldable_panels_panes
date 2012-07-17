@@ -478,7 +478,7 @@ function fieldable_panels_panes_views_api() {
 /**
  * Preprocess function for fieldable-panels-pane.tpl.php
  */
-function fieldable_panels_panes_preprocess_fieldable_panels_pane(&$vars) {
+function template_preprocess_fieldable_panels_pane(&$vars) {
   $vars += array('content' => array());
   foreach (element_children($vars['elements']) as $key) {
     $vars['content'][$key] = $vars['elements'][$key];
