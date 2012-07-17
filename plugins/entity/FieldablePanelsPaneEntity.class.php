@@ -1,11 +1,11 @@
 <?php
 /**
  * @file
- * Class for the Panelizer taxonomy term entity plugin.
+ * Class for the Panelizer fieldable_panels_pane term entity plugin.
  */
 
 /**
- * Panelizer Entity taxonomy term plugin class.
+ * Panelizer Entity fieldable_panels_pane term plugin class.
  *
  * Handles term specific functionality for Panelizer.
  */
@@ -36,19 +36,5 @@ class FieldablePanelsPaneEntity extends PanelizerEntityDefault {
 
   function get_default_display($bundle, $view_mode) {
     return parent::get_default_display($bundle, $view_mode);
-  }
-
-  /**
-   * Implements a delegated hook_form_alter.
-   *
-   * We want to add Panelizer settings for the bundle to the node type form.
-   */
-  public function hook_form_alter(&$form, &$form_state, $form_id) {
-    if ($form_id == 'taxonomy_form_vocabulary') {
-      if (isset($form['#vocabulary'])) {
-        $bundle = $form['#vocabulary']->machine_name;
-        $this->add_bundle_setting_form($form, $form_state, $bundle, array('machine_name'));
-      }
-    }
   }
 }
