@@ -66,7 +66,7 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_content_types
 /**
  * Callback to render our content type.
  */
-function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subtype, $conf, $panel_args, $context) {
+function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subtype, $conf, $panel_args = array(), $context = array()) {
   $entity = fieldable_panels_panes_load_entity($subtype);
   if ($entity && !empty($entity->fpid) && fieldable_panels_panes_access('view', $entity)) {
     $settings = field_bundle_settings('fieldable_panels_pane', $entity->bundle);
@@ -103,6 +103,13 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_admin_title($
   }
 
   return $output;
+}
+
+/**
+ * Callback to provide administrative information for a fieldable panels pane.
+ */
+function fieldable_panels_panes_fieldable_panels_pane_content_type_admin_info($subtype, $conf) {
+  return fieldable_panels_panes_fieldable_panels_pane_content_type_render($subtype, $conf);
 }
 
 /**
