@@ -177,7 +177,7 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     $entity_type = 'fieldable_panels_pane';
     drupal_alter(array('fieldable_panels_pane_view', 'entity_view'), $entity->content, $entity_type);
 
-    return drupal_render($entity->content);
+    return $entity->content;
   }
 
   public function delete($fpids) {
