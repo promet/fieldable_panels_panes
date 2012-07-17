@@ -236,6 +236,37 @@ function fieldable_panels_panes_menu() {
     'load arguments' => array(6),
   ) + $base;
 
+  if (module_exists('devel')) {
+    $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes/devel'] = array(
+      'title' => 'Devel',
+      'page callback' => 'devel_load_object',
+      'page arguments' => array('fieldable_panels_pane', 4),
+      'access arguments' => array('access devel information'),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 100,
+      'file' => 'devel.pages.inc',
+      'file path' => drupal_get_path('module', 'devel'),
+    );
+
+    $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes/devel/load'] = array(
+      'title' => 'Load',
+      'type' => MENU_DEFAULT_LOCAL_TASK,
+    );
+
+    $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes/devel/render'] = array(
+      'title' => 'Render',
+      'page callback' => 'devel_render_object',
+      // Normally this would be the name of the entity type, but slightly
+      // modified in order to call the right function.
+      'page arguments' => array('fieldable_panels_panes', 4),
+      'access arguments' => array('access devel information'),
+      'file' => 'devel.pages.inc',
+      'file path' => drupal_get_path('module', 'devel'),
+      'type' => MENU_LOCAL_TASK,
+      'weight' => 100,
+    );
+  }
+
   $items['admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type'] = array(
     'title callback' => 'fieldable_panels_panes_entities_title',
     'title arguments' => array(4),
