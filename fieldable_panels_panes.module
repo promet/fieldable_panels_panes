@@ -299,9 +299,6 @@ function fieldable_panels_panes_theme() {
   return array(
     'fieldable_panels_pane' => array(
       'render element' => 'elements',
-      'variable'  => array(
-        'element'  => NULL,
-      ),
       'template'  => 'fieldable-panels-pane',
     ),
   );
