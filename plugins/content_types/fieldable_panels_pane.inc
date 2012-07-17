@@ -136,26 +136,7 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form($fo
     return $form;
   }
 
-  // @todo: This really should be in CTools, if possible, in order to ensure AJAX works
-  // everywhere.
-
-  // module_load_include uses an unfortunately annoying syntax to work, making it
-  // difficult to translate the more simple $path + $file syntax.
-
-  $plugin = $form_state['plugin'];
-  $module = $plugin['module'];
-
-  // Cut the module path out.
-  $path = str_replace(drupal_get_path('module', $module) . '/', '', $plugin['path'] . '/' . $plugin['file']);
-  $type = pathinfo($path, PATHINFO_EXTENSION);
-  $name = str_replace('.' . $type, '', $path);
-
-  // Now add this to the build info files so that AJAX requests will know to load it.
-  $form_state['build_info']['files']["$module:$name.$type"] = array(
-    'type' => $type,
-    'module' => $module,
-    'name' => $name,
-  );
+  ctools_form_include_file($form_state, $form_state['plugin']['path'] . '/' . $form_state['plugin']['file']);
 
   $entity_info = entity_get_info('fieldable_panels_pane');
   $view_mode_options = array();
