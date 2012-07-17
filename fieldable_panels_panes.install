@@ -183,3 +183,12 @@ function fieldable_panels_panes_update_7103(&$sandbox) {
   // All caches are flushed during the update process, so we do nothing.
   return t('Theme registry cache has been cleared.');
 }
+
+/*
+ * Update menu paths.
+ */
+function fieldable_panels_panes_update_7104(&$sandbox) {
+  // We don't have to flush caches manually since the update process will flush
+  // all caches anyway.
+  return t('Menu cache has been flushed.');
+}

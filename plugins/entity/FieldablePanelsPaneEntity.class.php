@@ -11,7 +11,7 @@
  */
 class FieldablePanelsPaneEntity extends PanelizerEntityDefault {
 // @todo this path is too deep to handle.
-//  public $entity_admin_root = 'admin/structure/panels/entity/manage/%';
+//  public $entity_admin_root = 'admin/structure/fieldable-panels-panes/manage/%';
 //  public $entity_admin_bundle = 5;
   public $views_table = 'fieldable_panels_panes';
 

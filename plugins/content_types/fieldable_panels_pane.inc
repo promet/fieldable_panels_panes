@@ -83,7 +83,7 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subty
       $block->admin_links[] = array(
         'title' => t('Edit pane'),
         'alt' => t("Edit the values in this pane"),
-        'href' => "admin/structure/panels/entity/view/$entity->fpid/edit",
+        'href' => "admin/structure/fieldable-panels-panes/view/$entity->fpid/edit",
         'query' => drupal_get_destination(),
       );
     }
