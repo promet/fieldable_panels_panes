@@ -491,6 +491,8 @@ function template_preprocess_fieldable_panels_pane(&$vars) {
   foreach ($vars['content'] as $content) {
     $vars['fields'] .= render($content);
   }
+
+  $vars['theme_hook_suggestions'][] = 'fieldable_panels_pane__' . $vars['elements']['#element']->bundle;
 }
 
 /**
