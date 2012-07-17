@@ -45,7 +45,7 @@ class PanelsPaneController extends DrupalDefaultEntityController {
 
     switch ($op) {
       case 'create':
-        return user_access('create fieldable panels panes');
+        return user_access('create fieldable ' . $entity);
 
       case 'view':
         ctools_include('context');
