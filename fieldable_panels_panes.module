@@ -579,6 +579,9 @@ function template_preprocess_fieldable_panels_pane(&$vars) {
 function fieldable_panels_panes_preprocess_panels_pane(&$vars) {
   if ($vars['pane']->type == 'fieldable_panels_pane') {
     $entity = fieldable_panels_panes_load_entity($vars['pane']->subtype);
+    if ($entity->link && !empty($vars['title'])) {
+      $vars['title'] = l($vars['title'], $entity->path);
+    }
     $vars['classes_array'][] = 'pane-bundle-' . ctools_cleanstring($entity->bundle, array('lower case' => TRUE));
   }
 }
@@ -773,6 +776,26 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
   ctools_include('dependent');
   ctools_add_js('dependent');
 
+  $form['link'] = array(
+    '#weight' => -10,
+  );
+
+  $form['link']['link'] = array(
+    '#title' => t('Make title a link'),
+    '#type' => 'checkbox',
+    '#default_value' => $entity->link,
+    '#description' => t('Check here to make the title link to another page.'),
+    '#id' => 'edit-link',
+  );
+
+  $form['link']['path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Path'),
+    '#description' => t('The path for this link. This can be an internal Drupal path such as %add-node or an external URL such as %drupal. Enter %front to link to the front page.', array('%front' => '<front>', '%add-node' => 'node/add', '%drupal' => 'http://drupal.org')),
+    '#dependency' => array('edit-link' => array(1)),
+    '#default_value' => $entity->path,
+  );
+
   $form['reusable'] = array(
     '#weight' => 10,
   );
@@ -867,6 +890,8 @@ function fieldable_panels_panes_entity_edit_form_submit($form, &$form_state) {
 
   // Copy hardcoded fields.
   $entity->title = $form_state['values']['title'];
+  $entity->link = $form_state['values']['link'];
+  $entity->path = $form_state['values']['path'];
   $entity->reusable = $form_state['values']['reusable'];
   $entity->category = $form_state['values']['category'];
   $entity->admin_title = $form_state['values']['admin_title'];

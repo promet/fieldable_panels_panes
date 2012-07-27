@@ -223,6 +223,8 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     $values += array(
       'bundle' => 'fieldable_panels_pane',
       'title' => '',
+      'link' => '',
+      'path' => '',
       'reusable' => FALSE,
       'admin_title' => '',
       'admin_description' => '',
