@@ -74,6 +74,7 @@ function fieldable_panels_panes_fieldable_panels_pane_content_type_render($subty
   if ($entity && !empty($entity->fpid) && fieldable_panels_panes_access('view', $entity)) {
     $settings = field_bundle_settings('fieldable_panels_pane', $entity->bundle);
     $block = new stdClass();
+    $block->title = '';
     if (empty($settings['extra_fields']['display']) || !empty($settings['extra_fields']['display']['title']['default']['visible'])) {
       $block->title = !empty($entity->title) ? filter_xss_admin($entity->title) : '';
     }
