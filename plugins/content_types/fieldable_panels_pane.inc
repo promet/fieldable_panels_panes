@@ -299,6 +299,10 @@ function _fieldable_panels_panes_load_entity($subtype_name) {
       $content = reset($content);
     }
   }
+  elseif ($type == 'vid') {
+    $fpid = db_query('SELECT fpid FROM {fieldable_panels_panes_revision} WHERE vid = :vid', array(':vid' => $id))->fetchField();
+    $content = fieldable_panels_panes_load($fpid, $id);
+  }
   else {
     $content = fieldable_panels_panes_load($id);
   }
