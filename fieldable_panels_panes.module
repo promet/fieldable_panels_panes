@@ -285,7 +285,7 @@ function fieldable_panels_panes_menu() {
     'page callback' => 'fieldable_panels_panes_entities_add_page',
     'page arguments' => array(4),
     'access callback' => 'fieldable_panels_panes_access',
-    'access arguments' => array('create', 5),
+    'access arguments' => array('create', 4),
     'type' => MENU_LOCAL_TASK,
   ) + $base;
 
