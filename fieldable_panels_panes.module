@@ -53,7 +53,7 @@ function fieldable_panels_panes_entity_info() {
       ),
 
       // entity module callbacks
-      'view callback' => 'entity_metadata_view_single',
+      'view callback' => 'fieldable_panels_panes_view',
       'creation callback' => 'fieldable_panels_panes_create',
       'access callback' => 'fieldable_panels_panes_access',
       'save callback' => 'fieldable_panels_panes_save',
@@ -688,6 +688,12 @@ function fieldable_panels_panes_delete_multiple($fpids) {
  * @see node_view()
  */
 function fieldable_panels_panes_view($entity, $view_mode = 'full', $langcode = NULL) {
+  // If this function is being called by the Entity API callback, then the
+  // first argument will be an array of just one entity.
+  if (is_array($entity)) {
+    $entity = reset($entity);
+  }
+
   return entity_get_controller('fieldable_panels_pane')->view($entity, $view_mode, $langcode);
 }
 
