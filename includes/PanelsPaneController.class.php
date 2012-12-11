@@ -126,8 +126,8 @@ class PanelsPaneController extends DrupalDefaultEntityController {
       return $entity;
     }
     catch (Exception $e) {
-      $transaction->rollback('fieldable_panels_panes');
-      watchdog_exception('fieldable_panels_panes', $e);
+      $transaction->rollback();
+      watchdog_exception('fieldable_panels_pane', $e);
     }
 
     return FALSE;
