@@ -162,6 +162,14 @@ class PanelsPaneController extends DrupalDefaultEntityController {
   }
 
   public function view($entity, $view_mode = 'full', $langcode = NULL) {
+    // Allow modules to change the view mode.
+    $context = array(
+      'entity_type' => 'fieldable_panels_pane',
+      'entity' => $entity,
+      'langcode' => $langcode,
+    );
+    drupal_alter('entity_view_mode', $view_mode, $context);
+
     // attach our fields and prepare the pane for rendering
     field_attach_prepare_view('fieldable_panels_pane', array($entity->fpid => $entity), $view_mode, $langcode);
     entity_prepare_view('fieldable_panels_pane', array($entity->fpid => $entity), $langcode);
