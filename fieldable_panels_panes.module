@@ -589,11 +589,12 @@ function template_preprocess_fieldable_panels_pane(&$vars) {
  */
 function fieldable_panels_panes_preprocess_panels_pane(&$vars) {
   if ($vars['pane']->type == 'fieldable_panels_pane') {
-    $entity = fieldable_panels_panes_load_entity($vars['pane']->subtype);
-    if ($entity->link && !empty($vars['title'])) {
-      $vars['title'] = l($vars['title'], $entity->path);
+    if ($entity = fieldable_panels_panes_load_entity($vars['pane']->subtype)) {
+      if ($entity->link && !empty($vars['title'])) {
+        $vars['title'] = l($vars['title'], $entity->path);
+      }
+      $vars['classes_array'][] = 'pane-bundle-' . ctools_cleanstring($entity->bundle, array('lower case' => TRUE));
     }
-    $vars['classes_array'][] = 'pane-bundle-' . ctools_cleanstring($entity->bundle, array('lower case' => TRUE));
   }
 }
 
