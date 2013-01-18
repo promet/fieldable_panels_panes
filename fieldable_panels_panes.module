@@ -921,6 +921,7 @@ function fieldable_panels_panes_entity_edit_form_submit($form, &$form_state) {
   $entity->title = $form_state['values']['title'];
   $entity->link = $form_state['values']['link'];
   $entity->path = $form_state['values']['path'];
+  $entity->language = $form_state['values']['language'];
   $entity->reusable = $form_state['values']['reusable'];
   $entity->category = $form_state['values']['category'];
   $entity->admin_title = $form_state['values']['admin_title'];
