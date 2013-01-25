@@ -173,8 +173,8 @@ class PanelsPaneController extends DrupalDefaultEntityController {
     // attach our fields and prepare the pane for rendering
     field_attach_prepare_view('fieldable_panels_pane', array($entity->fpid => $entity), $view_mode, $langcode);
     entity_prepare_view('fieldable_panels_pane', array($entity->fpid => $entity), $langcode);
-    $entity->content = field_attach_view('fieldable_panels_pane', $entity, $view_mode, $langcode);
-    $entity->content += array(
+    $build = field_attach_view('fieldable_panels_pane', $entity, $view_mode, $langcode);
+    $build += array(
       '#fieldable_panels_pane' => $entity,
       '#theme' => 'fieldable_panels_pane',
       '#element' => $entity,
@@ -182,10 +182,18 @@ class PanelsPaneController extends DrupalDefaultEntityController {
       '#language' => $langcode,
     );
 
-    $entity_type = 'fieldable_panels_pane';
-    drupal_alter(array('fieldable_panels_pane_view', 'entity_view'), $entity->content, $entity_type);
+    // Add contextual links for this fieldable panel pane, except when the pane
+    // is already being displayed on its own page. Modules may alter this
+    // behavior (for example, to restrict contextual links to certain view
+    // modes) by implementing hook_fieldable_panels_pane_view_alter().
+    if (!empty($entity->fpid) && !($view_mode == 'full' && fieldable_panels_pane_is_page($entity))) {
+      $build['#contextual_links']['fieldable_panels_panes'] = array('admin/structure/fieldable-panels-panes/view', array($entity->fpid));
+    }
 
-    return $entity->content;
+    $entity_type = 'fieldable_panels_pane';
+    drupal_alter(array('fieldable_panels_pane_view', 'entity_view'), $build, $entity_type);
+
+    return $build;
   }
 
   public function delete($fpids) {
