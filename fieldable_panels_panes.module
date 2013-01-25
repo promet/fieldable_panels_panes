@@ -314,12 +314,12 @@ function fieldable_panels_panes_menu() {
   );
 
   $items['admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type/add'] = array(
-    'title' => 'Add',
+    'title' => 'Add fieldable panel pane',
     'page callback' => 'fieldable_panels_panes_entities_add_page',
     'page arguments' => array(4),
     'access callback' => 'fieldable_panels_panes_access',
     'access arguments' => array('create', 4),
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_LOCAL_ACTION,
   ) + $base;
 
   return $items;
