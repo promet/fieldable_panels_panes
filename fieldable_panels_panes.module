@@ -797,6 +797,11 @@ function fieldable_panels_panes_entity_edit_form($form, &$form_state) {
     '#weight' => -10,
   );
 
+  $form['language'] = array(
+    '#type' => 'value',
+    '#value' => $entity->language,
+  );
+
   // Make the other form items dependent upon it.
   ctools_include('dependent');
   ctools_add_js('dependent');
