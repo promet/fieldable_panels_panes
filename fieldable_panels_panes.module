@@ -376,25 +376,29 @@ function fieldable_panels_panes_theme() {
  * Implements hook_admin_menu_map().
  */
 function fieldable_panels_panes_admin_menu_map() {
+  $map = array();
+
   $bundles = array();
   $info = entity_get_info('fieldable_panels_pane');
-
   foreach ($info['bundles'] as $bundle_name => $bundle_info) {
     $bundles[] = strtr($bundle_name, '_', '-');
 
-    if (isset($bundle_info['admin'])) {
-      $admin_path = $bundle_info['admin']['path'];
-      $fields = array();
+    // Add mapping for the individual fields if the Field UI module is enabled.
+    if (module_exists('field_ui')) {
+      if (isset($bundle_info['admin'])) {
+        $admin_path = $bundle_info['admin']['path'];
+        $fields = array();
 
-      foreach (field_info_instances('fieldable_panels_pane', $bundle_name) as $field) {
-        $fields[] = $field['field_name'];
+        foreach (field_info_instances('fieldable_panels_pane', $bundle_name) as $field) {
+          $fields[] = $field['field_name'];
+        }
+
+        $map["$admin_path/fields/%field_ui_menu"]['parent'] = "$admin_path/fields";
+        $map["$admin_path/fields/%field_ui_menu"]['arguments'][] = array(
+          '%fieldable_panels_panes_type' => array($bundle_name),
+          '%field_ui_menu' => $fields,
+        );
       }
-
-      $map["$admin_path/fields/%field_ui_menu"]['parent'] = "$admin_path/fields";
-      $map["$admin_path/fields/%field_ui_menu"]['arguments'][] = array(
-        '%fieldable_panels_panes_type' => array($bundle_name),
-        '%field_ui_menu' => $fields,
-      );
     }
   }
 

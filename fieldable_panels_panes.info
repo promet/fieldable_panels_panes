@@ -4,7 +4,6 @@ package = "Panels"
 core = "7.x"
 dependencies[] = "panels"
 dependencies[] = "views"
-dependencies[] = "field_ui"
 
 files[] = includes/PanelsPaneController.class.php
 files[] = includes/translation.handler.fieldable_panels_pane.inc
