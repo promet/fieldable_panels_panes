@@ -67,6 +67,28 @@ function fieldable_panels_panes_entity_info() {
           'path wildcard' => '%fieldable_panels_panes',
         ),
       ),
+
+      // Title module support
+      'field replacement' => array(
+        'title' => array(
+          'field' => array(
+            'type' => 'text',
+            'cardinality' => 1,
+            'translatable' => TRUE,
+          ),
+          'instance' => array(
+            'label' => t('Title'),
+            'description' => t('A field replacing fieldable panel pane title.'),
+            'required' => FALSE,
+            'settings' => array(
+              'text_processing' => 0,
+            ),
+            'widget' => array(
+              'weight' => -10,
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }
