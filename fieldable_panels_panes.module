@@ -268,8 +268,8 @@ function fieldable_panels_panes_menu() {
     'context' => MENU_CONTEXT_INLINE,
     'page callback' => 'fieldable_panels_panes_entity_make_current_page',
     'page arguments' => array(4),
-    'access callback' => 'fieldable_panels_panes_access',
-    'access arguments' => array('update', 4),
+    'access callback' => 'fieldable_panels_panes_entity_make_current_access',
+    'access arguments' => array(4),
     'weight' => -8,
     'load arguments' => array(6),
   ) + $base;
@@ -511,6 +511,20 @@ function fieldable_panels_panes_entity_title($entity) {
   }
 
   return t('No title');
+}
+
+/**
+ * Access callback to set a revision of a fieldable panel pane as current.
+ *
+ * @param object $entity_info
+ *   A fieldable panel pane object.
+ *
+ * @return bool
+ *   TRUE if the specific revision of the panel pane can be set as the current
+ *   revision, otherwise, FALSE.
+ */
+function fieldable_panels_panes_entity_make_current_access($entity) {
+  return fieldable_panels_panes_access('update', $entity) && $entity->vid != $entity->current_vid;
 }
 
 // -------------------------------------------------------------------------
