@@ -11,6 +11,31 @@
 class PanelsPaneController extends DrupalDefaultEntityController {
   public $entity;
 
+  /**
+   * Overrides DrupalDefaultEntityController::resetCache().
+   */
+  public function resetCache(array $ids = NULL) {
+    if (module_exists('entitycache')) {
+      EntityCacheControllerHelper::resetEntityCache($this, $ids);
+    }
+    parent::resetCache($ids);
+  }
+
+  /**
+   * Overrides DrupalDefaultEntityController::load().
+   */
+  public function load($ids = array(), $conditions = array()) {
+    if (module_exists('entitycache')) {
+      return EntityCacheControllerHelper::entityCacheLoad($this, $ids, $conditions);
+    }
+    else {
+      return parent::load($ids, $conditions);
+    }
+  }
+
+  /**
+   * Overrides DrupalDefaultEntityController::attachLoad().
+   */
   public function attachLoad(&$queried_entities, $revision_id = FALSE) {
     parent::attachLoad($queried_entities, $revision_id);
 
@@ -296,5 +321,4 @@ class PanelsPaneController extends DrupalDefaultEntityController {
 
     return $entity;
   }
-
 }
