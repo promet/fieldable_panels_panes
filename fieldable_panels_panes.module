@@ -184,8 +184,9 @@ function fieldable_panels_panes_menu() {
     'weight' => -9,
   ) + $base;
 
-  $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes/view-access'] = array(
-    'title' => 'View access',
+  // Access control
+  $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes/access'] = array(
+    'title' => 'Access control',
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'fieldable_panels_panes_entity_edit_access_page',
     'page arguments' => array('view', 4),
@@ -193,15 +194,19 @@ function fieldable_panels_panes_menu() {
     'access arguments' => array('update', 4),
     'weight' => 10,
   ) + $base;
-
-  $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes/update-access'] = array(
-    'title' => 'Edit access',
+  $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes/access/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+  $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes/access/update'] = array(
+    'title' => 'Edit',
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'fieldable_panels_panes_entity_edit_access_page',
     'page arguments' => array('edit', 4),
     'access callback' => 'fieldable_panels_panes_access',
     'access arguments' => array('update', 4),
-    'weight' => 11,
+    'weight' => 10,
   ) + $base;
 
   $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes/delete'] = array(
