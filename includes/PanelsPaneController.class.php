@@ -214,8 +214,9 @@ class PanelsPaneController extends DrupalDefaultEntityController {
       $build['#contextual_links']['fieldable_panels_panes'] = array('admin/structure/fieldable-panels-panes/view', array($entity->fpid));
     }
 
-     // Allow modules to modify the structured pane.
-    drupal_alter(array('fieldable_panels_pane_view', 'entity_view'), $build, $context['entity_type']);
+    // Allow modules to modify the structured pane.
+    $type = 'fieldable_panels_pane';
+    drupal_alter(array('fieldable_panels_pane_view', 'entity_view'), $build, $type);
 
     return $build;
   }
