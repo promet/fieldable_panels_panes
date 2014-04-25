@@ -13,7 +13,6 @@
  * caching and if this .inc file is loaded before the plugin is
  * requested, the $plugin = array() notation doesn't work.
  */
-
 function fieldable_panels_panes_fieldable_panels_pane_ctools_content_types() {
   return array(
     'title' => t('Fielded custom content'),

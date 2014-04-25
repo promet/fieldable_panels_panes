@@ -15,6 +15,21 @@
 function fieldable_panels_panes_entity_info() {
   $info = array();
 
+  ctools_include('export');
+  $bundles = array();
+
+  foreach (ctools_export_crud_load_all('fieldable_panels_pane_type') as $type) {
+    $bundles[$type->name] = array(
+      'label' => $type->title,
+      'admin' => array(
+        'path' => 'admin/structure/fieldable-panels-panes/%ctools_export_ui',
+        'bundle argument' => 3,
+        'real path' => 'admin/structure/fieldable-panels-panes/' . $type->name,
+        'access arguments' => array('administer fieldable panels panes'),
+      ),
+    );
+  }
+
   $info['fieldable_panels_pane'] = array(
     'label' => t('Fieldable panel pane'),
     'controller class' => 'PanelsPaneController',
@@ -31,20 +46,8 @@ function fieldable_panels_panes_entity_info() {
       'uuid' => 'uuid',
       'revision uuid' => 'vuuid',
     ),
-    'bundles' => array(
-      // @todo We need to store the possible bundles and create a UI.
-      // to allow for more bundles. For now, hook_panels_panes_entity_info_alter
-      // will work.
-      'fieldable_panels_pane' => array(
-        'label' => t('Panels pane'),
-        'admin' => array(
-          'path' => 'admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type',
-          'bundle argument' => 4,
-          'real path' => 'admin/structure/fieldable-panels-panes/manage/fieldable-panels-pane',
-          'access arguments' => array('administer fieldable panels panes'),
-        ),
-      ),
-    ),
+    'bundles' => $bundles,
+    'bundle keys' => array('bundle' => 'name'),
     'view modes' => array(
       // @todo we should support view modes.
       'full' => array(
@@ -102,7 +105,40 @@ function fieldable_panels_panes_entity_info() {
 }
 
 /**
- * Implements hook_fied_extra_fields().
+ * Implements hook_module_implements_alter().
+ */
+function fieldable_panels_panes_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'entity_info_alter') {
+    // Fieldable Panels Panes will do a bit of clean-up to prevent issues with
+    // obsolete paths found in legacy bundles that are provided by modules via
+    // hook_entity_info_alter(), but we need to make sure that our
+    // implementation is called last.
+    $group = $implementations['fieldable_panels_panes'];
+    unset($implementations['fieldable_panels_panes']);
+    $implementations['fieldable_panels_panes'] = $group;
+  }
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
+function fieldable_panels_panes_entity_info_alter(&$info) {
+  $old_base_path = 'admin/structure/panels/entity/manage';
+  $new_base_path = 'admin/structure/fieldable-panels-panes/manage';
+
+  if (is_array($info) && !empty($info)) {
+    foreach ($info['fieldable_panels_pane']['bundles'] as $name => &$bundle) {
+      if (strpos($bundle['admin']['path'], $old_base_path) !== FALSE) {
+        $bundle['admin']['path'] = str_replace($old_base_path, $new_base_path, $bundle['admin']['path']);
+        $bundle['admin']['real path'] = str_replace($old_base_path, $new_base_path, $bundle['admin']['real path']);
+        $bundle['admin']['bundle argument'] = $bundle['admin']['bundle argument'] - 1;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_field_extra_fields().
  */
 function fieldable_panels_panes_field_extra_fields() {
   $extra = array();
@@ -141,19 +177,7 @@ function fieldable_panels_panes_menu() {
     'file' => 'includes/admin.inc',
   );
 
-
-  $items['admin/structure/fieldable-panels-panes'] = array(
-    'title' => 'Fieldable Panels Panes',
-    'description' => 'Manage pane content types.',
-    'page callback' => 'fieldable_panels_panes_entities_page',
-  ) + $base;
-
-  $items['admin/structure/fieldable-panels-panes/list'] = array(
-    'title' => 'List',
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -10,
-  ) + $base;
-
+  // Legacy paths to support the old method of providing bundles via entity_hook_info().
   $items['admin/structure/fieldable-panels-panes/view/%fieldable_panels_panes'] = array(
     'title callback' => 'fieldable_panels_panes_entity_title',
     'title arguments' => array(4),
@@ -318,20 +342,20 @@ function fieldable_panels_panes_menu() {
     );
   }
 
-  $items['admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type'] = array(
+  $items['admin/structure/fieldable-panels-panes/manage/%fieldable_panels_pane_type'] = array(
     'title callback' => 'fieldable_panels_panes_entities_title',
     'title arguments' => array(4),
     'page callback' => 'fieldable_panels_panes_entities_list_page',
     'page arguments' => array(4),
   ) + $base;
 
-  $items['admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type/list'] = array(
+  $items['admin/structure/fieldable-panels-panes/manage/%fieldable_panels_pane_type/list'] = array(
     'title' => 'List',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
 
-  $items['admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type/add'] = array(
+  $items['admin/structure/fieldable-panels-panes/manage/%fieldable_panels_pane_type/add'] = array(
     'title' => 'Add fieldable panel pane',
     'page callback' => 'fieldable_panels_panes_entities_add_page',
     'page arguments' => array(4),
@@ -391,16 +415,16 @@ function fieldable_panels_panes_theme() {
 function fieldable_panels_panes_admin_menu_map() {
   $map = array();
 
-  $bundles = array();
+  $bundle_keys = array();
   $info = entity_get_info('fieldable_panels_pane');
   foreach ($info['bundles'] as $bundle_name => $bundle_info) {
-    $bundles[] = strtr($bundle_name, '_', '-');
+    $bundle_keys[] = $bundle_name;
   }
 
-  $map['admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type'] = array(
+  $map['admin/structure/fieldable-panels-panes/%ctools_export_ui'] = array(
     'parent' => 'admin/structure/fieldable-panels-panes',
     'arguments' => array(
-      array('%fieldable_panels_panes_type' => $bundles),
+      array('%ctools_export_ui' => $bundle_keys),
     ),
   );
 
@@ -439,7 +463,7 @@ function fieldable_panels_panes_admin_menu_map_alter(array &$map) {
       if (!empty($fields)) {
         $map["$admin_path/fields/%field_ui_menu"]['parent'] = "$admin_path/fields";
         $map["$admin_path/fields/%field_ui_menu"]['arguments'][] = array(
-          '%fieldable_panels_panes_type' => array($bundle_name),
+          '%ctools_export_ui' => array($bundle_name),
           '%field_ui_menu' => $fields,
         );
       }
@@ -458,24 +482,23 @@ function fieldable_panels_panes_flush_caches() {
  * Implementation of hook_panels_dashboard_blocks().
  */
 function fieldable_panels_panes_panels_dashboard_blocks(&$vars) {
+  ctools_include('export');
+
   $vars['links']['fieldable_panels_panes'] = array(
     'title' => l(t('Fieldable Panels Panes'), 'admin/structure/fieldable-panels-panes'),
     'description' => t('Fieldable Panels Panes are fieldable entities that can be created directly in the Panels UI or created in a separate administrative UI to reuse later in a panel pane.'),
   );
 
-  $entity_info = entity_get_info('fieldable_panels_pane');
   $count = 0;
   $rows = array();
 
-  foreach ($entity_info['bundles'] as $bundle => $info) {
-    $type_url_str = str_replace('_', '-', $bundle);
-
+  foreach (ctools_export_crud_load_all('fieldable_panels_pane_type') as $type) {
     $rows[] = array(
-      check_plain($info['label']),
-      l(t('List'), 'admin/structure/fieldable-panels-panes/manage/' . $type_url_str),
-      l(t('Add'), 'admin/structure/fieldable-panels-panes/manage/' . $type_url_str . '/add'),
-      l(t('Manage Fields'), 'admin/structure/fieldable-panels-panes/manage/' . $type_url_str . '/fields'),
-      l(t('Manage Display'), 'admin/structure/fieldable-panels-panes/manage/' . $type_url_str . '/display'),
+      $type->title,
+      l(t('List'), 'admin/structure/fieldable-panels-panes/' . $type->name),
+      l(t('Add'), 'admin/structure/fieldable-panels-panes/' . $type->name . '/add'),
+      l(t('Manage Fields'), 'admin/structure/fieldable-panels-panes/' . $type->name . '/fields'),
+      l(t('Manage Display'), 'admin/structure/fieldable-panels-panes/' . $type->name . '/display'),
     );
 
     // Only display 10.
@@ -499,7 +522,6 @@ function fieldable_panels_panes_panels_dashboard_blocks(&$vars) {
     'class' => 'dashboard-fieldable-panels-panes',
     'section' => 'right',
   );
-
 }
 
 // -------------------------------------------------------------------------
@@ -508,13 +530,22 @@ function fieldable_panels_panes_panels_dashboard_blocks(&$vars) {
 /**
  * Properly format the type from the URL version to the internal version.
  */
-function fieldable_panels_panes_type_load($type) {
+function fieldable_panels_pane_type_load($type) {
   $type = str_replace('-', '_', $type);
   $entity_info = entity_get_info('fieldable_panels_pane');
 
   if (isset($entity_info['bundles'][$type])) {
     return $type;
   }
+}
+
+/**
+ * @depricated Backwards compatability layer.
+ *
+ * @see fieldable_panels_pane_type_load().
+ */
+function fieldable_panels_panes_type_load($type) {
+  return fieldable_panels_pane_type_load($type);
 }
 
 /**
@@ -527,6 +558,16 @@ function fieldable_panels_panes_entities_title($type) {
   if (isset($entity_info['bundles'][$type])) {
     return $entity_info['bundles'][$type]['label'];
   }
+}
+
+/**
+ * Title callback for fieldable panels panes exportable items.
+ *
+ * @param $item
+ *   A %ctools_export_ui object.
+ */
+function fieldable_panels_pane_type_title($item) {
+  return $item->title;
 }
 
 /**
@@ -575,6 +616,10 @@ function fieldable_panels_panes_entity_make_current_access($entity) {
  * Implements hook_ctools_plugin_directory()
  */
 function fieldable_panels_panes_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' && $plugin_type == 'export_ui') {
+    return 'plugins/' . $plugin_type;
+  }
+
   if ($owner == 'ctools' && $plugin_type == 'content_types') {
     return 'plugins/' . $plugin_type;
   }
