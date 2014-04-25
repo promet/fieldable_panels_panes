@@ -10,9 +10,8 @@
  * Handles term specific functionality for Panelizer.
  */
 class FieldablePanelsPaneEntity extends PanelizerEntityDefault {
-// @todo this path is too deep to handle.
-//  public $entity_admin_root = 'admin/structure/fieldable-panels-panes/%';
-//  public $entity_admin_bundle = 4;
+  public $entity_admin_root = 'admin/structure/fieldable-panels-panes/%fieldable_panels_pane_type';
+  public $entity_admin_bundle = 3;
   public $views_table = 'fieldable_panels_panes';
 
   public function entity_access($op, $entity) {

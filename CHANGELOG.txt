@@ -1,5 +1,6 @@
 Fieldable Panels Panes 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------------------------
+#2247179 by DamienMcKenna: Fixed Panelizer admin path.
 #1618308 by helior, acrollet, realityloop, magicmyth, DamienMcKenna: UI for
   managing FPP bundles.
 #2146479: Fixed conflict with recent change to admin_menu
