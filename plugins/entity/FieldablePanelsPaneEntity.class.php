@@ -12,6 +12,7 @@
 class FieldablePanelsPaneEntity extends PanelizerEntityDefault {
   public $entity_admin_root = 'admin/structure/fieldable-panels-panes/%fieldable_panels_pane_type';
   public $entity_admin_bundle = 3;
+  public $supports_revisions = TRUE;
   public $views_table = 'fieldable_panels_panes';
 
   public function entity_access($op, $entity) {
