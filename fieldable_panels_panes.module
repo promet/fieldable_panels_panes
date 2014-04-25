@@ -55,6 +55,9 @@ function fieldable_panels_panes_entity_info() {
         'custom settings' => FALSE,
       ),
     ),
+    'inline entity form' => array(
+      'controller' => 'FieldablePanelsPaneInlineEntityFormController',
+    ),
 
     // entity module callbacks
     'view callback' => 'entity_metadata_view_single',

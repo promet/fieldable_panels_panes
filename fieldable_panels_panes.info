@@ -25,3 +25,6 @@ files[] = plugins/views/fieldable_panels_panes_handler_field_make_current.inc
 
 ; Entity API integration.
 files[] = fieldable_panels_panes.info.inc
+
+; Inline Entity Form integration.
+files[] = includes/FieldablePanelsPaneInlineEntityFormController.class.php
