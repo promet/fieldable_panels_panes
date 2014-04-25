@@ -22,7 +22,7 @@ function fieldable_panels_panes_entity_info() {
     $bundles[$type->name] = array(
       'label' => $type->title,
       'admin' => array(
-        'path' => 'admin/structure/fieldable-panels-panes/%ctools_export_ui',
+        'path' => 'admin/structure/fieldable-panels-panes/%fieldable_panels_pane_type',
         'bundle argument' => 3,
         'real path' => 'admin/structure/fieldable-panels-panes/' . $type->name,
         'access arguments' => array('administer fieldable panels panes'),
@@ -421,7 +421,7 @@ function fieldable_panels_panes_admin_menu_map() {
     $bundle_keys[] = $bundle_name;
   }
 
-  $map['admin/structure/fieldable-panels-panes/%ctools_export_ui'] = array(
+  $map['admin/structure/fieldable-panels-panes/%fieldable_panels_pane_type'] = array(
     'parent' => 'admin/structure/fieldable-panels-panes',
     'arguments' => array(
       array('%ctools_export_ui' => $bundle_keys),
