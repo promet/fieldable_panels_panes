@@ -1,5 +1,6 @@
 Fieldable Panels Panes 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------------------------
+#1911176 by Dave Reid: Edit form improvements.
 #2237097 by DamienMcKenna: Inline_Entity_Form support.
 #2237137 by DamienMcKenna: Entity API support.
 #1618308 by DamienMcKenna: Follow-up to fix menu paths.
