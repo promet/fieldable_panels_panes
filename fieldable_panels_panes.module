@@ -1098,3 +1098,12 @@ function fieldable_panels_pane_is_page($pane) {
   $page_page = menu_get_object('fieldable_panels_panes', 4);
   return (!empty($page_page) ? $page_page->fpid == $pane->fpid : FALSE);
 }
+
+/**
+ * Entity property callback.
+ */
+function fieldable_panels_panes_metadata_fpp_get_properties($entity, array $options, $name, $entity_type) {
+  if ($name == 'path') {
+    return url($entity->path);
+  }
+}

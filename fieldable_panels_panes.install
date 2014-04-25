@@ -75,7 +75,7 @@ function fieldable_panels_panes_schema() {
         'size' => 'tiny',
       ),
       'admin_title' => array(
-        'description' => 'The title it will appear in the Add Content dialog as.',
+        'description' => 'The title as it will appear in the Add Content dialog.',
         'type' => 'varchar',
         'length' => 255,
       ),
@@ -84,7 +84,7 @@ function fieldable_panels_panes_schema() {
         'type' => 'text',
       ),
       'category' => array(
-        'description' => 'The category it will appear in the Add Content dialog under.',
+        'description' => 'The category under which it will appear in the Add Content dialog.',
         'type' => 'text',
       ),
       'view_access' => array(
