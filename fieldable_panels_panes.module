@@ -727,6 +727,7 @@ function fieldable_panels_panes_preprocess_panels_pane(&$vars) {
       if ($entity->link && !empty($vars['title'])) {
         $vars['title'] = l($vars['title'], $entity->path);
       }
+      ctools_include('cleanstring');
       $vars['classes_array'][] = 'pane-bundle-' . ctools_cleanstring($entity->bundle, array('lower case' => TRUE));
     }
   }
