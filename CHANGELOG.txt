@@ -1,5 +1,6 @@
 Fieldable Panels Panes 7.x-1.x-dev, xxxx-xx-xx
 ----------------------------------------------
+#2268531 by DamienMcKenna: Ensure variable exists before running strpos() on it.
 #2250293 by DamienMcKenna: Revisions support for Panelizer.
 #1911176 by Dave Reid: Edit form improvements.
 #2237097 by DamienMcKenna: Inline_Entity_Form support.

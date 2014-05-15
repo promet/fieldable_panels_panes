@@ -131,7 +131,7 @@ function fieldable_panels_panes_entity_info_alter(&$info) {
 
   if (is_array($info) && !empty($info)) {
     foreach ($info['fieldable_panels_pane']['bundles'] as $name => &$bundle) {
-      if (strpos($bundle['admin']['path'], $old_base_path) !== FALSE) {
+      if (isset($bundle['admin']['path']) && strpos($bundle['admin']['path'], $old_base_path) !== FALSE) {
         $bundle['admin']['path'] = str_replace($old_base_path, $new_base_path, $bundle['admin']['path']);
         $bundle['admin']['real path'] = str_replace($old_base_path, $new_base_path, $bundle['admin']['real path']);
         $bundle['admin']['bundle argument'] = $bundle['admin']['bundle argument'] - 1;
