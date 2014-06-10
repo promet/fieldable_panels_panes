@@ -15,6 +15,7 @@ Fieldable Panels Panes 7.x-1.x-dev, xxxx-xx-xx
   (https://drupal.org/node/2146479).
 #2074735 by rogical: Added configure link to admin/structure/fieldable-panels
   -panes in the info file.
+#2250383# by DamienMcKenna: Require CToosl 1.4 or newer.
 
 
 Fieldable Panels Panes 7.x-1.5, 2013-05-07
