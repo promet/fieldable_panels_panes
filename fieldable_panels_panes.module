@@ -59,11 +59,12 @@ function fieldable_panels_panes_entity_info() {
       'controller' => 'FieldablePanelsPaneInlineEntityFormController',
     ),
 
-    // entity module callbacks
+    // Entity API module callbacks.
     'view callback' => 'entity_metadata_view_single',
     'creation callback' => 'fieldable_panels_panes_create',
     'access callback' => 'fieldable_panels_panes_access',
     'save callback' => 'fieldable_panels_panes_save',
+    'deletion callback' => 'fieldable_panels_panes_delete',
 
     // Entity translation support
     'translation' => array(
