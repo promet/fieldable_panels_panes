@@ -10,6 +10,8 @@ configure = admin/structure/fieldable-panels-panes
 
 files[] = includes/PanelsPaneController.class.php
 files[] = includes/translation.handler.fieldable_panels_pane.inc
+files[] = includes/fieldable_panels_pane.migrate.inc
+
 files[] = plugins/views/fieldable_panels_panes_handler_argument_bundle.inc
 files[] = plugins/views/fieldable_panels_panes_handler_field_bundle.inc
 files[] = plugins/views/fieldable_panels_panes_handler_field_delete_entity.inc

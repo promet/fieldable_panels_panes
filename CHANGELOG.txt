@@ -16,7 +16,7 @@ Fieldable Panels Panes 7.x-1.x-dev, xxxx-xx-xx
 #2074735 by rogical: Added configure link to admin/structure/fieldable-panels
   -panes in the info file.
 #2250383 by DamienMcKenna: Require CToosl 1.4 or newer.
-
+#2145209 by primozsusa, DamienMcKenna: Support for the Migrate module.
 
 
 Fieldable Panels Panes 7.x-1.5, 2013-05-07
