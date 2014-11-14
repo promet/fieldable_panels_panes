@@ -16,7 +16,6 @@ function fieldable_panels_panes_entity_property_info() {
 
   $default_properties = array(
     'setter callback' => 'entity_property_verbatim_set',
-    'getter callback' => 'entity_metadata_entity_get_properties',
   );
 
   $properties['fpid'] = array(
@@ -24,14 +23,12 @@ function fieldable_panels_panes_entity_property_info() {
     'type' => 'integer',
     'description' => t('The unique ID of the entity.'),
     'schema field' => 'fpid',
-    'getter callback' => 'entity_metadata_entity_get_properties',
   );
   $properties['vid'] = array(
     'label' => t('Revision ID'),
     'type' => 'integer',
     'description' => t("The unique ID of the entity's revision."),
     'schema field' => 'vid',
-    'getter callback' => 'entity_metadata_entity_get_properties',
   );
   $properties['is_new'] = array(
     'label' => t('Is new'),
@@ -85,7 +82,7 @@ function fieldable_panels_panes_entity_property_info() {
   $properties['path'] = array(
     'label' => t('Path'),
     'description' => t('The path the title should link to, uses alias if one available.'),
-    'getter callback' => 'fpp_entity_metadata_fpp_get_properties',
+    'getter callback' => 'fieldable_panels_panes_metadata_fpp_get_properties',
     'type' => 'uri',
   ) + $default_properties;
   $properties['path_raw'] = array(
